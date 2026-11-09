@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Starts the Home Assistant starter wizard (Mac and Linux).
+# Starts the DonkeyHome wizard (Mac and Linux).
 cd "$(dirname "$0")" || exit 1
 if command -v python3 >/dev/null 2>&1; then
   python3 wizard/wizard.py "$@"

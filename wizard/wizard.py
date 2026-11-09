@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Home Assistant starter wizard.
+"""DonkeyHome: Home Assistant starter wizard.
 
 Asks a few plain questions about your home and writes a ready-to-copy Home Assistant
 configuration folder (config/). Only uses Python's standard library.
@@ -177,7 +177,7 @@ def script(key: str, alias: str, icon: str, description: str, steps: list[str]) 
 
 
 def configuration_yaml(a: dict) -> str:
-    return f"""# Home Assistant configuration made by the starter wizard for {a['home_name']}.
+    return f"""# Home Assistant configuration made by the DonkeyHome wizard for {a['home_name']}.
 # Most of the logic lives in packages/ (one file per subject). This file just switches things on.
 # After you edit any YAML file: Settings > Tools > YAML > Check configuration, then Restart.
 
@@ -442,7 +442,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.answers:
             answers = validate(json.loads(args.answers.read_text(encoding="utf-8")))
         else:
-            print("Home Assistant starter wizard\n" + "=" * 29)
+            print("DonkeyHome wizard\n" + "=" * 17)
             print("Press Enter to keep the answer in [brackets]. Ctrl+C stops without changing anything.\n")
             saved = json.loads(DEFAULT_ANSWERS.read_text(encoding="utf-8")) if DEFAULT_ANSWERS.exists() else {}
             answers = ask_until_valid({**EXAMPLE, **saved})

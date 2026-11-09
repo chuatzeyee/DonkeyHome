@@ -1,4 +1,4 @@
-# Home Assistant Starter Wizard
+# DonkeyHome
 
 A beginner-friendly way to go from "I bought a small computer" to a working smart home with one-tap routines, automatic "everyone left" switch-off, phone notifications and a tidy dashboard.
 

@@ -1,5 +1,5 @@
 @echo off
-rem Starts the Home Assistant starter wizard (Windows).
+rem Starts the DonkeyHome wizard (Windows).
 cd /d "%~dp0"
 where py >nul 2>nul
 if %errorlevel%==0 (

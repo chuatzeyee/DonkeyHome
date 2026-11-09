@@ -31,7 +31,7 @@ No programming needed. Written for Home Assistant 2026.10 and 2026.11.
 3. Answer the questions (press Enter to keep a suggestion).
 4. Copy the new `config` folder's contents into Home Assistant (guide 2 shows how).
 
-Needs Python 3.9 or newer. Nothing else to install.
+Needs Python 3.10 or newer. Nothing else to install.
 
 Prefer to look before you run anything? The `config` folder in this project is already filled in for an example home (4 rooms, 2 people) so you can read exactly what the wizard makes.
 

@@ -20,8 +20,8 @@ import shutil
 import sys
 from pathlib import Path
 
-if sys.version_info < (3, 9):
-    sys.exit("Python 3.9 or newer is needed. Get it from https://www.python.org/downloads/")
+if sys.version_info < (3, 10):
+    sys.exit("Python 3.10 or newer is needed. Get it from https://www.python.org/downloads/")
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_OUT = ROOT / "config"

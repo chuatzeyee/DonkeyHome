@@ -19,7 +19,7 @@
 
 ## Step 2: Run the wizard
 
-The wizard needs **Python 3.9 or newer**.
+The wizard needs **Python 3.10 or newer**.
 
 - **Windows:** double-click **`setup.bat`**. If it says Python is missing, install it from <https://www.python.org/downloads/> and tick **Add python.exe to PATH** on the first installer screen. Then double-click `setup.bat` again.
 - **Mac:** open **Terminal**, type `cd ` (with a space), drag the kit's folder into the Terminal window, press Enter, then type `./setup.sh` and press Enter. If it asks to install developer tools, say yes and run it again.

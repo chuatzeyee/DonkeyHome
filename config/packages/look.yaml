@@ -1,0 +1,39 @@
+# Made by DonkeyHome.
+# The DonkeyHome look for every screen of Home Assistant: dark by default, light with the sun/moon button.
+# Applied at every start, so a restored backup comes back the way it was left. Change it any time; to stop
+# using it, set your own theme in your profile and delete this file.
+
+input_boolean:
+  donkeyhome_light_mode:
+    name: Light mode
+    icon: mdi:theme-light-dark
+
+script:
+  donkeyhome_toggle_theme:
+    alias: Switch light and dark
+    icon: mdi:theme-light-dark
+    mode: queued
+    sequence:
+      - action: input_boolean.toggle
+        target:
+          entity_id: input_boolean.donkeyhome_light_mode
+      - action: script.donkeyhome_apply_theme
+
+  donkeyhome_apply_theme:
+    alias: Apply the DonkeyHome theme
+    mode: queued
+    sequence:
+      - action: frontend.set_theme
+        continue_on_error: true
+        data:
+          name: "{{ 'DonkeyHome Light' if is_state('input_boolean.donkeyhome_light_mode', 'on') else 'DonkeyHome' }}"
+          name_dark: "{{ 'DonkeyHome Light' if is_state('input_boolean.donkeyhome_light_mode', 'on') else 'DonkeyHome' }}"
+
+automation:
+  - id: donkeyhome_theme_at_start
+    alias: "DonkeyHome: theme at start"
+    triggers:
+      - trigger: homeassistant
+        event: start
+    actions:
+      - action: script.donkeyhome_apply_theme

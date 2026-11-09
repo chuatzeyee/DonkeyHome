@@ -30,8 +30,12 @@ DATA_DIR = Path(os.environ.get("DATA_DIR", "/data"))
 PORT = int(os.environ.get("PORT", "8099"))
 ALLOWED_CLIENT = os.environ.get("ALLOWED_CLIENT", "172.30.32.2")  # the Supervisor's ingress proxy; "*" in tests
 WEB = Path(__file__).resolve().parent / "web"
-STATIC = {"/": ("index.html", "text/html"), "/app.js": ("app.js", "text/javascript"),
-          "/style.css": ("style.css", "text/css"), "/donkey.svg": ("donkey.svg", "image/svg+xml")}
+FONTS = Path(__file__).resolve().parent / "assets" / "www" / "donkeyhome"  # the same fonts the dashboard gets
+STATIC = {"/": (WEB / "index.html", "text/html"), "/app.js": (WEB / "app.js", "text/javascript"),
+          "/icons.js": (WEB / "icons.js", "text/javascript"), "/style.css": (WEB / "style.css", "text/css"),
+          "/donkey.svg": (WEB / "donkey.svg", "image/svg+xml"),
+          **{f"/fonts/{f}": (FONTS / f, "font/woff2") for f in
+             ("GoogleSans-latin.woff2", "InstrumentSerif-latin.woff2", "InstrumentSerif-Italic-latin.woff2")}}
 MAX_BODY = 64 * 1024
 DEVICE_DOMAINS = ("light", "fan", "climate", "media_player", "lock", "cover", "vacuum")
 # Lines of Home Assistant's own starting configuration.yaml (comments and blank lines ignored).
@@ -204,10 +208,10 @@ class Handler(BaseHTTPRequestHandler):
             return
         path = self.path.split("?", 1)[0]
         if path in STATIC:
-            name, ctype = STATIC[path]
-            body = (WEB / name).read_bytes()
+            file, ctype = STATIC[path]
+            body = file.read_bytes()
             self.send_response(200)
-            self.send_header("Content-Type", ctype + "; charset=utf-8")
+            self.send_header("Content-Type", ctype if ctype.startswith("font/") else ctype + "; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
@@ -234,7 +238,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         path = self.path.split("?", 1)[0]
         if path == "/api/preview":
-            self._run(lambda: wizard.build(wizard.validate(raw)))
+            self._run(lambda: {k: v for k, v in wizard.build(wizard.validate(raw)).items() if isinstance(v, str)})
         elif path == "/api/apply":
             if not apply_lock.acquire(blocking=False):
                 self._json(409, error="Already setting up. Please wait.")

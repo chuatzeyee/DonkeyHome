@@ -82,8 +82,8 @@ def shots(out: Path) -> None:
     out.mkdir(exist_ok=True)
     with sync_playwright() as p:
         browser = p.chromium.launch(executable_path=os.environ.get("CHROME_PATH") or None)
-        for scheme, size in (("light", (1100, 900)), ("dark", (390, 844))):
-            page = browser.new_page(viewport={"width": size[0], "height": size[1]}, color_scheme=scheme)
+        for scheme, size in (("light", (390, 844)), ("dark", (390, 844))):
+            page = browser.new_page(viewport={"width": size[0], "height": size[1]}, color_scheme=scheme, device_scale_factor=2)
             page.goto(APP + "/")
             page.wait_for_selector("text=Let's start")
             page.screenshot(path=str(out / f"{scheme}-0-welcome.png"), full_page=True)
@@ -93,7 +93,7 @@ def shots(out: Path) -> None:
                 page.screenshot(path=str(out / f"{scheme}-{n}.png"), full_page=True)
                 if n == 6:
                     break
-                page.click("button.primary")
+                page.click(".dock .btn.dark")
             # The last two screens, with the setup itself faked (the real one runs later in this test).
             fake = {"steps": ["Created the room Study", "Saved a backup", "Wrote 6 files", "Checked: all good",
                               "Restarting Home Assistant"], "backup": "donkeyhome_backups/2026-01-01_10-00-00"}
@@ -102,29 +102,62 @@ def shots(out: Path) -> None:
             page.click("text=Set up my home")
             page.wait_for_selector("text=Almost there")
             page.screenshot(path=str(out / f"{scheme}-7-working.png"), full_page=True)
-            page.wait_for_selector("text=Your home is set up", timeout=90000)
+            page.wait_for_selector("text=Your home is ready", timeout=90000)
             page.screenshot(path=str(out / f"{scheme}-8-done.png"), full_page=True)
             page.close()
         browser.close()
     print(f"Screenshots in {out}")
 
 
-def dashboard_shot(out: Path) -> None:
-    """Log in to the throwaway Home Assistant and screenshot the dashboard DonkeyHome made."""
+def add_demo_devices(ha_name: str, token: str) -> None:
+    """Screenshots only: Home Assistant's demo lights, aircons, locks and weather, placed in rooms."""
+    subprocess.run(["docker", "exec", ha_name, "sh", "-c", "printf 'demo:\\n' > /config/packages/zz_demo.yaml"], check=True)
+    try:
+        http("POST", HA + "/api/services/homeassistant/restart", {}, token=token)
+    except (urllib.error.URLError, OSError):
+        pass
+    time.sleep(10)
+    wait(lambda: http("GET", HA + "/api/states/light.kitchen_lights", token=token), "demo devices", 300)
+    os.environ.update(CORE_WS=f"ws://localhost:{HA_PORT}/api/websocket", HA_TOKEN=token)
+    sys.path.insert(0, str(ROOT / "donkeyhome" / "app"))
+    import importlib
+    import haclient
+    importlib.reload(haclient)
+    rooms = {"living": "living_room", "ceiling": "living_room", "kitchen": "kitchen", "bed": "study",
+             "office": "study", "entrance": "living_room", "hvac": "living_room", "heatpump": "study", "ecobee": "kitchen"}
+    with haclient.WebSocket(f"ws://localhost:{HA_PORT}/api/websocket") as ws:
+        for entry in ws.call("config/entity_registry/list"):
+            if entry["entity_id"].split(".")[0] in ("light", "climate"):
+                area = next((a for k, a in rooms.items() if k in entry["entity_id"]), None)
+                if area and entry.get("device_id"):  # the demo's entities take their room from their device
+                    ws.call("config/device_registry/update", device_id=entry["device_id"], area_id=area)
+    for entity in ("light.kitchen_lights", "light.living_room_rgbww_lights"):
+        http("POST", HA + "/api/services/light/turn_on", {"entity_id": entity}, token=token)
+    http("POST", HA + "/api/services/light/turn_off", {"entity_id": "light.ceiling_lights"}, token=token)
+    http("POST", HA + "/api/services/light/turn_off", {"entity_id": "light.entrance_color_white_lights"}, token=token)
+
+
+def dashboard_shots(out: Path, token: str) -> None:
+    """Log in to the throwaway Home Assistant and screenshot DonkeyHome's dashboard on a phone, dark then light."""
     from playwright.sync_api import sync_playwright
 
     ui = f"http://127.0.0.1:{HA_PORT}"  # not localhost: avoids the service worker reloading mid-shot
     with sync_playwright() as p:
         browser = p.chromium.launch(executable_path=os.environ.get("CHROME_PATH") or None)
-        page = browser.new_page(viewport={"width": 1280, "height": 900})
+        page = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=2)
         page.goto(ui + "/", wait_until="networkidle")
         page.fill("input[name=username]", "test")
         page.fill("input[name=password]", "test-pass-123")
         page.keyboard.press("Enter")
         page.wait_for_function("() => document.querySelector('home-assistant')?.hass?.connected", timeout=60000)
-        page.goto(ui + "/my-home/home", wait_until="networkidle")
-        page.wait_for_timeout(3000)
-        page.screenshot(path=str(out / "ha-dashboard.png"))
+        for scheme in ("dark", "light"):
+            if scheme == "light":
+                http("POST", HA + "/api/services/script/donkeyhome_toggle_theme", {}, token=token)
+                time.sleep(2)
+            for path in ("home", "room-living-room", "lights", "climate"):
+                page.goto(f"{ui}/my-home/{path}", wait_until="networkidle")
+                page.wait_for_timeout(2500)
+                page.screenshot(path=str(out / f"ha-{scheme}-{path}.png"), full_page=path == "home")
         browser.close()
 
 
@@ -182,7 +215,8 @@ def main() -> int:
         check(True, "Home Assistant restarted and loaded the routines")
         for entity in ("input_select.house_mode", "input_boolean.auto_presence", "script.routine_leaving_home",
                        "automation.presence_everyone_left", "automation.weekly_check_low_batteries", "automation.mine"):
-            check(http("GET", f"{HA}/api/states/{entity}", token=token)["state"] not in ("unavailable",), f"{entity} exists")
+            state = wait(lambda e=entity: http("GET", f"{HA}/api/states/{e}", token=token), entity, 90)["state"]
+            check(state != "unavailable", f"{entity} exists")
         http("POST", HA + "/api/services/script/routine_good_night", {}, token=token)
         time.sleep(2)
         mode = http("GET", HA + "/api/states/input_select.house_mode", token=token)["state"]
@@ -191,10 +225,14 @@ def main() -> int:
         check(boards["config_status"] == "donkeyhome" and boards["saved"]["home_name"] == "Test Flat",
               "second visit remembers the answers")
         if args.shots:
-            dashboard_shot(Path("/tmp/donkeyhome-shots"))
+            add_demo_devices(ha_name, token)
+            dashboard_shots(Path("/tmp/donkeyhome-shots"), token)
         print("\nAll good.")
         return 0
     finally:
+        if os.environ.get("KEEP"):  # debugging: leave both containers running
+            print(f"Kept: Home Assistant {HA} (test / test-pass-123), app {APP}, config {cfg}")
+            return 0
         subprocess.run(["docker", "rm", "-f", ha_name, app_name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         subprocess.run(["docker", "run", "--rm", "-v", f"{cfg}:/c", "alpine", "rm", "-rf", "/c/.storage", "/c/deps"],
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

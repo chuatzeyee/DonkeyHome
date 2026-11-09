@@ -72,14 +72,28 @@ class WizardTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             wizard.write(wizard.build(answers()), Path(tmp))
             texts = [p.read_text(encoding="utf-8") for p in Path(tmp).rglob("*.yaml")]
-        self.assertEqual(len(texts), 9)
+        self.assertEqual(len(texts), 11)
         for text in texts:
             for char, name in BANNED.items():
                 self.assertNotIn(char, text, name)
 
     def test_shipped_example_config_is_up_to_date(self):
-        for rel, text in wizard.build(answers()).items():
-            self.assertEqual((ROOT / "config" / rel).read_text(encoding="utf-8"), text, rel)
+        for rel, data in wizard.build(answers()).items():
+            path = ROOT / "config" / rel
+            self.assertEqual(path.read_bytes() if isinstance(data, bytes) else path.read_text(encoding="utf-8"), data, rel)
+
+    def test_dashboard_template_is_fully_filled(self):
+        dash = wizard.build(answers())["dashboards/home.yaml"]
+        self.assertNotIn("@@", dash)
+        for room in ("living-room", "kitchen", "bedroom", "bathroom"):
+            self.assertIn(f"path: room-{room}", dash)
+        self.assertIn("type: home-area", dash)
+
+    def test_licensed_canela_font_is_never_shipped(self):
+        for rel, data in wizard.build(answers()).items():
+            self.assertNotIn("canela", rel.lower())
+            if isinstance(data, str):
+                self.assertNotIn("Canela", data, rel)
 
 
 class AppTest(unittest.TestCase):

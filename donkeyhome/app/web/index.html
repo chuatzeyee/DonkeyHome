@@ -2,23 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#EDEDF0" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1A1A1C" media="(prefers-color-scheme: dark)">
   <title>DonkeyHome</title>
   <link rel="icon" href="donkey.svg">
+  <link rel="preload" href="fonts/InstrumentSerif-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/GoogleSans-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="shell">
-    <header class="top">
-      <img src="donkey.svg" alt="" width="40" height="40">
-      <span class="brand">DonkeyHome</span>
-      <ol class="progress" id="progress" aria-label="Progress"></ol>
-    </header>
-    <section id="screen" class="card" aria-live="polite">
-      <p class="muted">Loading...</p>
-    </section>
-    <noscript><p class="card">DonkeyHome needs JavaScript. Please allow it for this page.</p></noscript>
-  </main>
+  <main class="page" id="page" aria-live="polite"><p class="muted">Loading...</p></main>
+  <nav class="dock" id="dock" hidden></nav>
+  <noscript><p class="page">DonkeyHome needs JavaScript. Please allow it for this page.</p></noscript>
+  <script src="icons.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

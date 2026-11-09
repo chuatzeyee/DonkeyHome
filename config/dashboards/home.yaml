@@ -1,61 +1,447 @@
 # Made by DonkeyHome.
-# The Our Home dashboard. Room cards need these areas (Settings > Areas, labels and zones):
-# Living Room, Kitchen, Bedroom, Bathroom
+# The Our Home dashboard. Phone first: a greeting sentence, room pills, lights per room, routines and a dock.
+# Everything is found by room (area) and kind of device, so no entity IDs are needed: new devices appear by themselves.
+# Cards: Home Assistant's own, plus button-card (www/donkeyhome/button-card.js, MIT) for the rounded Home cards.
+# Colours and fonts come from the DonkeyHome themes (themes/donkeyhome.yaml); the sun/moon button switches them.
+# Rooms: Living Room, Kitchen, Bedroom, Bathroom (Settings > Areas, labels and zones).
 
-title: "Our Home"
+button_card_templates:
+  dh_base:
+    show_icon: false
+    show_name: false
+    show_state: false
+    show_label: false
+    tap_action: {action: none}
+    hold_action: {action: none}
+    styles:
+      card:
+        - background: "var(--ha-card-background)"
+        - border: none
+        - border-radius: 32px
+        - box-shadow: var(--ha-card-box-shadow)
+        - color: "var(--primary-text-color)"
+        - padding: 0
+        - height: 100%
+        - font-family: var(--ha-font-family-body)
+      grid:
+        - height: 100%
+        - box-sizing: border-box
+  # Fully rounded: icon circle on the left, a title and a grey line.
+  dh_pill:
+    template: dh_base
+    variables:
+      icon: mdi:help
+      icon_bg: "var(--dh-surface-2)"
+      icon_color: "var(--primary-text-color)"
+      title: ""
+      subtitle: ""
+      bg: "var(--ha-card-background)"
+      text: "var(--primary-text-color)"
+      sub_color: "var(--secondary-text-color)"
+    styles:
+      card:
+        - border-radius: 999px
+        - height: 64px
+        - background: "[[[ return variables.bg ]]]"
+        - color: "[[[ return variables.text ]]]"
+      grid:
+        - padding: 6px 14px 6px 6px
+        - grid-template-areas: '"icon text"'
+        - grid-template-columns: auto 1fr
+        - column-gap: 12px
+        - align-items: center
+      custom_fields:
+        text: [justify-self: stretch, text-align: left, min-width: 0]
+    custom_fields:
+      icon: >-
+        [[[ return `<div style="width:50px;height:50px;border-radius:50%;background:${variables.icon_bg};display:flex;align-items:center;justify-content:center"><ha-icon icon="${variables.icon}" style="--mdc-icon-size:24px;color:${variables.icon_color}"></ha-icon></div>` ]]]
+      text: >-
+        [[[ return `<div style="font-size:17px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${variables.title}</div><div style="font-size:14px;color:${variables.sub_color};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${variables.subtitle}</div>` ]]]
+    extra_styles: |
+      ha-card { transition: transform 100ms ease; }
+      ha-card:active { transform: scale(0.97); }
+  # The lights of one room (variables.area), found through the entity and device registries. Light groups are
+  # skipped when counting so a group and its bulbs aren't counted twice. button-card works out variables in
+  # alphabetical order, so everything lives in one variable whose name sorts first: a_lights = {ids, on}.
+  dh_area_lights:
+    template: dh_base
+    triggers_update: all
+    variables:
+      area: ""
+      a_lights: |
+        [[[
+          const inArea = (id) => {
+            const e = hass.entities[id];
+            if (!e) return false;
+            const area = e.area_id || (e.device_id && hass.devices[e.device_id] ? hass.devices[e.device_id].area_id : null);
+            return area === variables.area;
+          };
+          const ids = Object.keys(states).filter((id) => id.startsWith('light.') && !states[id].attributes.entity_id && inArea(id));
+          return {ids, on: ids.filter((id) => states[id].state === 'on').length};
+        ]]]
+  # Room pill (the sideways strip under the greeting): pink while any light in the room is on; tap opens the room.
+  dh_room_pill:
+    template: dh_area_lights
+    show_name: true
+    variables: {path: home}
+    tap_action:
+      action: navigate
+      navigation_path: "[[[ return '/my-home/' + variables.path ]]]"
+    styles:
+      card:
+        - height: 40px
+        - border-radius: 999px
+        - background: "[[[ return variables.a_lights.on ? '#F2A7CF' : 'transparent' ]]]"
+        - border: "[[[ return variables.a_lights.on ? '1.5px solid #F2A7CF' : '1.5px solid var(--dh-outline)' ]]]"
+      grid:
+        - padding: 0 18px
+      name:
+        - font-size: 15px
+        - font-weight: 500
+        - white-space: nowrap
+        - color: "[[[ return variables.a_lights.on ? '#2A1220' : 'var(--primary-text-color)' ]]]"
+  # A room's lights as one pill: tap = all on / all off; press and hold = open the room.
+  dh_room_lights:
+    template: [dh_area_lights, dh_pill] # pill styles win; the light variables come first
+    variables:
+      icon: "[[[ return variables.a_lights.on ? 'mdi:lightbulb-on-outline' : 'mdi:lightbulb-outline' ]]]"
+      icon_bg: "[[[ return variables.a_lights.on ? 'rgba(255, 214, 10, 0.22)' : 'var(--dh-surface-2)' ]]]"
+      icon_color: "[[[ return variables.a_lights.on ? '#FFC800' : 'var(--secondary-text-color)' ]]]"
+      title: "[[[ return variables.name ]]]"
+      subtitle: >-
+        [[[ return !variables.a_lights.ids.length ? 'No lights yet' : variables.a_lights.on === 0 ? 'Off'
+              : variables.a_lights.on === variables.a_lights.ids.length ? (variables.a_lights.on === 1 ? 'On' : 'All on') : `${variables.a_lights.on} on` ]]]
+    tap_action:
+      action: perform-action
+      perform_action: "[[[ return variables.a_lights.on ? 'light.turn_off' : 'light.turn_on' ]]]"
+      target:
+        area_id: "[[[ return variables.area ]]]"
+    hold_action:
+      action: navigate
+      navigation_path: "[[[ return '/my-home/' + variables.path ]]]"
+  # A round icon button (the sun/moon switch).
+  dh_circle:
+    template: dh_base
+    show_icon: true
+    styles:
+      card:
+        - width: 48px
+        - height: 48px
+        - border-radius: 50%
+        - background: var(--dh-surface-2)
+      icon:
+        - width: 24px
+        - color: var(--primary-text-color)
+    extra_styles: |
+      ha-card { transition: transform 100ms ease; }
+      ha-card:active { transform: scale(0.92); }
+  # The dock: the bar floating at the bottom of the screen. Drawn by button-card itself (no nested built-in card,
+  # which can load too late). Icons only on phones, icon and label from 600 px. variables.active = this page.
+  dh_dock:
+    template: dh_base
+    variables: {active: home}
+    styles:
+      card: [background: none, box-shadow: none, height: 0px, overflow: visible]
+      custom_fields:
+        dock:
+          - position: fixed
+          - left: 50%
+          - transform: translateX(-50%)
+          - bottom: calc(18px + env(safe-area-inset-bottom, 0px))
+          - width: min(400px, calc(100vw - 40px))
+          - z-index: 5
+          - border-radius: 32px
+          - box-shadow: var(--ha-view-footer-box-shadow)
+          - background: "#F4F4F5"
+          - padding: 8px 10px
+          - box-sizing: border-box
+          - pointer-events: auto # the view footer around it lets taps through; the dock itself must catch them
+    custom_fields:
+      dock: |
+        [[[
+          const items = [["Home", "mdi:home", "home"], ["Lights", "mdi:lightbulb-outline", "lights"], ["Climate", "mdi:snowflake", "climate"], ["Door", "mdi:lock", "door"], ["Media", "mdi:music", "media"]];
+          const go = (path) => `history.pushState(null, '', '${path}'); window.dispatchEvent(new CustomEvent('location-changed'))`;
+          return '<div class="dock-row">' + items.map(([name, icon, path]) =>
+            `<span role="button" aria-label="${name}" class="dock-item${path === variables.active ? ' on' : ''}" onpointerup="${go('/my-home/' + path)}">` +
+            `<ha-icon icon="${icon}"></ha-icon><span class="dock-label">${name}</span></span>`).join('') + '</div>';
+        ]]]
+    extra_styles: |
+      #dock { overflow: visible; white-space: normal; }
+      .dock-row { display: flex; justify-content: space-around; align-items: center; min-height: 48px; }
+      .dock-item { cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 10px;
+        color: #1C1C1E; font: 500 11px var(--ha-font-family-body); border-radius: 18px; transition: transform 100ms ease; }
+      .dock-item:active { transform: scale(0.9); }
+      .dock-item.on { color: #C2408A; }
+      .dock-item ha-icon { --mdc-icon-size: 24px; }
+      .dock-label { display: none; }
+      @media (min-width: 600px) { .dock-label { display: block; } .dock-item ha-icon { --mdc-icon-size: 22px; } }
+
 views:
-  - title: Home
-    path: home
+  - path: home
     icon: mdi:home
+    title: ""
     type: sections
-    max_columns: 4
+    max_columns: 3
+    dense_section_placement: true
+    header:
+      layout: responsive
+      card:
+        type: custom:button-card
+        template: dh_base
+        triggers_update: all
+        styles:
+          card:
+            - background: none
+            - box-shadow: none
+            - border-radius: 0
+            - overflow: visible
+            - padding: 8px 2px 0
+            - height: auto
+            - --ha-ripple-hover-opacity: 0
+            - --ha-ripple-pressed-opacity: 0
+          grid:
+            - grid-template-areas: '"hero mode"'
+            - grid-template-columns: 1fr auto
+            - align-items: start
+            - column-gap: 12px
+          custom_fields:
+            hero: [justify-self: stretch, text-align: left, white-space: normal, overflow: visible, padding-left: 3px]
+            mode: [align-self: start, padding-top: 6px]
+        custom_fields:
+          mode:
+            card:
+              type: custom:button-card
+              template: dh_circle
+              icon: mdi:theme-light-dark
+              tap_action:
+                action: perform-action
+                perform_action: script.donkeyhome_toggle_theme
+          hero: |
+            [[[
+              const nb = (html) => `<span style="white-space:nowrap">${html}</span>`;
+              const go = (path) => `history.pushState(null, '', '${path}'); window.dispatchEvent(new CustomEvent('location-changed'))`;
+              const more = (id) => `this.dispatchEvent(new CustomEvent('hass-more-info', {bubbles: true, composed: true, detail: {entityId: '${id}'}}))`;
+              const pill = (text, alert, click) =>
+                `<span role="button" onpointerdown="this.dataset.x = event.clientX; this.dataset.y = event.clientY; this.dataset.t = Date.now()" ` +
+                `onpointerup="if (Math.hypot(event.clientX - this.dataset.x, event.clientY - this.dataset.y) < 10 && Date.now() - this.dataset.t < 500) { ${click} }" ` +
+                `style="cursor:pointer;display:inline-block;background:${alert ? '#FF6B6B' : 'var(--dh-pill-bg)'};` +
+                `color:${alert ? '#141416' : 'var(--dh-pill-text)'};border-radius:999px;padding:0 12px;margin:3px 0;` +
+                `line-height:1.6;font-weight:500">${text}</span>`;
+              const all = (domain) => Object.keys(states).filter((id) => id.startsWith(domain + '.'));
+              const live = (id) => !['unavailable', 'unknown'].includes(states[id].state);
+
+              const name = (user && user.name) || '';
+              const h = new Date().getHours();
+              const hello = name ? `Hi ${name.split(' ')[0]}` : (h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening');
+
+              const words = {partlycloudy: 'partly cloudy', 'clear-night': 'clear', 'lightning-rainy': 'stormy',
+                             lightning: 'stormy', 'windy-variant': 'windy', exceptional: 'unusual'};
+              const wid = all('weather').find(live);
+              const t = wid ? states[wid].attributes.temperature : undefined;
+              const weather = wid && t !== undefined
+                ? `Outside it's ${nb(`${pill(`${Math.round(t)}° and ${words[states[wid].state] || states[wid].state}`, false, more(wid))}.`)} ` : '';
+
+              const lightIds = all('light').filter((id) => !states[id].attributes.entity_id);
+              const on = lightIds.filter((id) => states[id].state === 'on').length;
+              const lights = !lightIds.length ? ''
+                : on === 0 ? `All lights are ${nb(`${pill('off', false, go('/my-home/lights'))}.`)}`
+                : `${pill(on === 1 ? '1 light' : `${on} lights`, false, go('/my-home/lights'))} ${on === 1 ? 'is' : 'are'} on.`;
+
+              const ac = all('climate').filter(live);
+              const running = ac.filter((id) => states[id].state !== 'off');
+              const verb = {cool: 'cooling to', heat: 'heating to', heat_cool: 'keeping', auto: 'keeping', dry: 'drying at'};
+              const one = running.length === 1 ? states[running[0]] : null;
+              const climate = !ac.length ? ''
+                : running.length === 0 ? ` The aircon is ${nb(`${pill('off', false, go('/my-home/climate'))}.`)}`
+                : one ? ` The aircon is ${nb(`${pill(one.attributes.temperature !== undefined && verb[one.state] ? `${verb[one.state]} ${Math.round(one.attributes.temperature)}°` : 'on', false, more(running[0]))}.`)}`
+                : ` ${pill(`${running.length} aircons`, false, go('/my-home/climate'))} are on.`;
+
+              const locks = all('lock').filter(live);
+              const open = locks.filter((id) => states[id].state !== 'locked');
+              const door = !locks.length ? ''
+                : ` The ${locks.length > 1 ? 'doors are' : 'door is'} ${nb(`${pill(open.length ? 'unlocked' : 'locked', open.length > 0, go('/my-home/door'))}.`)}`;
+
+              const sentence = (weather + lights + climate + door).trim() || 'Add your first devices under Settings, then they show up here.';
+              return `<div style="font-family:var(--dh-font-display);font-size:46px;line-height:1.05;letter-spacing:-0.5px;margin-bottom:14px">${hello}</div>` +
+                `<div style="font-size:19px;line-height:1.75;color:var(--primary-text-color)">${sentence}</div>`;
+            ]]]
     sections:
+      - type: grid
+        cards:
+          # The room pills, sideways scroll.
+          - type: custom:button-card
+            template: dh_base
+            styles:
+              card:
+                - background: none
+                - box-shadow: none
+                - border-radius: 0
+                - overflow-x: auto
+                - height: 64px
+                - scrollbar-width: none
+              grid:
+                - grid-template-areas: '"r0 r1 r2 r3"'
+                - grid-template-columns: repeat(4, max-content)
+                - column-gap: 8px
+                - align-content: center
+            custom_fields:
+              r0: {card: {type: custom:button-card, template: dh_room_pill, name: "Living Room", variables: {area: living_room, path: room-living-room}}}
+              r1: {card: {type: custom:button-card, template: dh_room_pill, name: "Kitchen", variables: {area: kitchen, path: room-kitchen}}}
+              r2: {card: {type: custom:button-card, template: dh_room_pill, name: "Bedroom", variables: {area: bedroom, path: room-bedroom}}}
+              r3: {card: {type: custom:button-card, template: dh_room_pill, name: "Bathroom", variables: {area: bathroom, path: room-bathroom}}}
+            grid_options: {columns: 12, rows: 1}
+          - type: custom:button-card
+            template: dh_pill
+            entity: input_select.house_mode
+            triggers_update: [input_select.house_mode]
+            variables:
+              icon: "[[[ return {Home: 'mdi:home-outline', Away: 'mdi:exit-run', Night: 'mdi:weather-night'}[entity.state] || 'mdi:home-outline' ]]]"
+              title: "[[[ return entity.state === 'Away' ? 'Away' : entity.state === 'Night' ? 'Night' : 'Home' ]]]"
+              subtitle: House mode
+            tap_action: {action: more-info}
+            grid_options: {columns: 6, rows: 1}
+          - type: custom:button-card
+            template: dh_pill
+            entity: input_boolean.auto_presence
+            triggers_update: [input_boolean.auto_presence]
+            variables:
+              icon: mdi:map-marker-radius-outline
+              bg: "[[[ return entity.state === 'on' ? 'linear-gradient(90deg, #F7C6E0, #F2A7CF)' : 'var(--ha-card-background)' ]]]"
+              text: "[[[ return entity.state === 'on' ? '#2A1220' : 'var(--primary-text-color)' ]]]"
+              sub_color: "[[[ return entity.state === 'on' ? 'rgba(42, 18, 32, 0.7)' : 'var(--secondary-text-color)' ]]]"
+              icon_bg: "[[[ return entity.state === 'on' ? 'rgba(255, 255, 255, 0.55)' : 'var(--dh-surface-2)' ]]]"
+              icon_color: "[[[ return entity.state === 'on' ? '#2A1220' : 'var(--primary-text-color)' ]]]"
+              title: Auto leave
+              subtitle: "[[[ return entity.state === 'on' ? 'On' : 'Off' ]]]"
+            tap_action: {action: toggle}
+            grid_options: {columns: 6, rows: 1}
+      - type: grid
+        cards:
+          - type: heading
+            heading: Lights
+            heading_style: title
+          - type: custom:button-card
+            template: dh_room_lights
+            variables: {name: "Living Room", area: living_room, path: room-living-room}
+            grid_options: {columns: 6, rows: 1}
+          - type: custom:button-card
+            template: dh_room_lights
+            variables: {name: "Kitchen", area: kitchen, path: room-kitchen}
+            grid_options: {columns: 6, rows: 1}
+          - type: custom:button-card
+            template: dh_room_lights
+            variables: {name: "Bedroom", area: bedroom, path: room-bedroom}
+            grid_options: {columns: 6, rows: 1}
+          - type: custom:button-card
+            template: dh_room_lights
+            variables: {name: "Bathroom", area: bathroom, path: room-bathroom}
+            grid_options: {columns: 6, rows: 1}
       - type: grid
         cards:
           - type: heading
             heading: Routines
-          - type: button
-            entity: script.routine_good_morning
-            show_state: false
+            heading_style: title
+          - type: custom:button-card
+            template: dh_pill
+            variables: {icon: "mdi:weather-sunset-up", title: "Good Morning", subtitle: "Start the day"}
             tap_action:
-              action: toggle
-          - type: button
-            entity: script.routine_leaving_home
-            show_state: false
+              action: perform-action
+              perform_action: script.turn_on
+              target:
+                entity_id: script.routine_good_morning
+            grid_options: {columns: 6, rows: 1}
+          - type: custom:button-card
+            template: dh_pill
+            variables: {icon: "mdi:exit-run", title: "Leaving Home", subtitle: "Switch off and lock"}
             tap_action:
-              action: toggle
-          - type: button
-            entity: script.routine_arriving_home
-            show_state: false
+              action: perform-action
+              perform_action: script.turn_on
+              target:
+                entity_id: script.routine_leaving_home
+            grid_options: {columns: 6, rows: 1}
+          - type: custom:button-card
+            template: dh_pill
+            variables: {icon: "mdi:home-import-outline", title: "I'm Home", subtitle: "Welcome back"}
             tap_action:
-              action: toggle
-          - type: button
-            entity: script.routine_good_night
-            show_state: false
+              action: perform-action
+              perform_action: script.turn_on
+              target:
+                entity_id: script.routine_arriving_home
+            grid_options: {columns: 6, rows: 1}
+          - type: custom:button-card
+            template: dh_pill
+            variables: {icon: "mdi:weather-night", title: "Good Night", subtitle: "Lights off, doors locked"}
             tap_action:
-              action: toggle
-          - type: button
-            entity: script.routine_everything_off
-            show_state: false
+              action: perform-action
+              perform_action: script.turn_on
+              target:
+                entity_id: script.routine_good_night
+            grid_options: {columns: 6, rows: 1}
+          - type: custom:button-card
+            template: dh_pill
+            variables: {icon: "mdi:power", title: "Everything Off", subtitle: "Lights, fans, aircon, TV"}
             tap_action:
-              action: toggle
+              action: perform-action
+              perform_action: script.turn_on
+              target:
+                entity_id: script.routine_everything_off
+            grid_options: {columns: 6, rows: 1}
       - type: grid
         cards:
-          - type: heading
-            heading: House
-          - type: tile
-            entity: input_select.house_mode
-          - type: tile
-            entity: input_boolean.auto_presence
-      - type: grid
-        cards:
-          - type: heading
-            heading: Rooms
-          - type: area
-            area: living_room
-          - type: area
-            area: kitchen
-          - type: area
-            area: bedroom
-          - type: area
-            area: bathroom
+          - type: custom:button-card
+            template: dh_base
+            styles: {card: [background: none, box-shadow: none, height: 90px]}
+    footer:
+      max_width: 400
+      card:
+        type: custom:button-card
+        template: dh_dock
+        variables: {active: home}
+  - path: room-living-room
+    title: "Living Room"
+    subview: true
+    strategy:
+      type: home-area
+      area: living_room
+  - path: room-kitchen
+    title: "Kitchen"
+    subview: true
+    strategy:
+      type: home-area
+      area: kitchen
+  - path: room-bedroom
+    title: "Bedroom"
+    subview: true
+    strategy:
+      type: home-area
+      area: bedroom
+  - path: room-bathroom
+    title: "Bathroom"
+    subview: true
+    strategy:
+      type: home-area
+      area: bathroom
+  - path: lights
+    title: Lights
+    icon: mdi:lightbulb-outline
+    subview: true
+    strategy:
+      type: light
+  - path: climate
+    title: Climate
+    icon: mdi:snowflake
+    subview: true
+    strategy:
+      type: climate
+  - path: door
+    title: Door
+    icon: mdi:lock
+    subview: true
+    strategy:
+      type: security
+  - path: media
+    title: Music and TV
+    icon: mdi:music
+    subview: true
+    strategy:
+      type: home-media-players

@@ -5,9 +5,14 @@
 # The standard Home Assistant features (history, logbook, phone app, sun, zones, backups and more).
 default_config:
 
-# Themes from the themes folder (Home Assistant's own default).
 frontend:
+  # Themes from the themes folder, including the DonkeyHome light and dark themes.
   themes: !include_dir_merge_named themes
+  # The DonkeyHome look: button-card (www/donkeyhome/button-card.js, MIT) and the Google Sans and
+  # Instrument Serif fonts (www/donkeyhome/fonts.css, SIL Open Font License).
+  extra_module_url:
+    - /local/donkeyhome/button-card.js?v=2
+    - /local/donkeyhome/fonts.js?v=2
 
 homeassistant:
   # Every .yaml file in packages/ is loaded automatically.

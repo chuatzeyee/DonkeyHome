@@ -1,18 +1,30 @@
 <p align="center"><img src="donkeyhome/logo.png" alt="DonkeyHome" width="420"></p>
 
-**Set up your smart home by answering six easy questions.** No programming, no files, no command line.
+**A beautiful, phone-first smart home in six easy questions.** No programming, no files, no command line.
 
-DonkeyHome is an app that runs inside Home Assistant. You click through six friendly screens (your home's name, your rooms, who lives there, coming and going, what should happen, check) and it sets everything up for you:
+DonkeyHome is an app that runs inside Home Assistant. You tap through six friendly screens (your home's name, your rooms, who lives there, coming and going, what should happen, check) and it turns Home Assistant into this:
 
+<p align="center">
+<img src="docs/images/dashboard-dark.png" alt="DonkeyHome dashboard, dark" width="250">
+<img src="docs/images/dashboard-light.png" alt="DonkeyHome dashboard, light" width="250">
+<img src="docs/images/dashboard-room.png" alt="A room page" width="250">
+</p>
+
+- **A dashboard that feels like an app:** a greeting that tells you what's going on ("3 lights are on. The door is unlocked."), room pills that turn pink when a room's lights are on, one tap per room for its lights, a floating dock, and a page per room. Light and dark, switched with one button. Google Sans and Instrument Serif fonts.
 - **Five one-tap routines:** Good Morning, Leaving Home, I'm Home, Good Night, Everything Off.
 - **Automatic leave and arrive:** when the last phone leaves, the house switches off and tells you; when the first one comes back, the arrival room lights up after dark.
-- **A dashboard** with the routines, the house mode and one card per room.
 - **Phone messages** through the Home Assistant app, and a weekly list of batteries to change.
 - **Any brand:** routines use "every light", "every fan" and so on, so new devices join in by themselves.
 
 It's safe: DonkeyHome backs up every file it changes, has Home Assistant check the new setup, and puts everything back if there is any problem. It never touches automations you made yourself.
 
-<p align="center"><img src="docs/images/wizard-rooms.png" alt="Choosing rooms in DonkeyHome" width="420"> <img src="docs/images/dashboard.png" alt="The dashboard DonkeyHome makes" width="420"></p>
+The setup itself looks the same:
+
+<p align="center">
+<img src="docs/images/wizard-welcome.png" alt="DonkeyHome welcome screen" width="250">
+<img src="docs/images/wizard-rooms.png" alt="Choosing rooms" width="250">
+<img src="docs/images/wizard-review.png" alt="The plan, before anything changes" width="250">
+</p>
 
 ## Install
 
@@ -46,6 +58,8 @@ donkeyhome/            the app: config.yaml, Dockerfile, DOCS.md, icon and logo
   app/wizard.py        turns your answers into Home Assistant files (also a command-line tool)
   app/haclient.py      talks to Home Assistant
   app/web/             the six screens
+  app/templates/       the dashboard DonkeyHome writes
+  app/assets/          the DonkeyHome theme, fonts and button-card, copied into Home Assistant
 config/                example of what DonkeyHome writes (4 rooms, 2 people)
 example-answers.json   the answers behind that example
 docs/                  the guides
@@ -54,4 +68,4 @@ tests/                 offline checks, plus an end-to-end test with a real Home 
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE). Bundled: button-card (MIT), Google Sans and Instrument Serif (SIL Open Font License), Material Design Icons (Pictogrammers Free License); details in `donkeyhome/app/assets/www/donkeyhome/LICENSES.md`.

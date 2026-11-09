@@ -102,9 +102,26 @@ Keep the page open. When Home Assistant is back, you see this:
 
 ![Done](images/wizard-done.png)
 
-✅ Check: click **Open my dashboard**. You see your **Routines**, **House** and **Rooms**:
+✅ Check: click **Open dashboard**. Home Assistant now has the DonkeyHome look everywhere, and your dashboard greets you:
 
-![Your new dashboard](images/dashboard.png)
+<p>
+<img src="images/dashboard-dark.png" alt="Your dashboard in dark mode" width="250">
+<img src="images/dashboard-light.png" alt="Your dashboard in light mode" width="250">
+</p>
+
+What's on it, top to bottom:
+
+| Part | What it does |
+|---|---|
+| **The greeting** | Says what's going on: the weather, how many lights are on, the aircon, whether the door is locked. Tap a dark pill to see more. A red pill means something needs you (like an unlocked door). |
+| **Sun/moon button** (top right) | Switches between dark and light. |
+| **Room pills** | One per room. Pink means a light is on in that room. Tap to open the room's page. |
+| **House mode** and **Auto leave** | Home, Away or Night; and the automatic leave and arrive switch (Step 6). |
+| **Lights** | One pill per room. Tap to switch that room's lights on or off. Press and hold to open the room. |
+| **Routines** | Tap to run. |
+| **The dock** (floating at the bottom) | Home, Lights, Climate, Door, and Music and TV. |
+
+Each room page, and the Lights, Climate, Door and Media pages, fill themselves with the devices you add (Step 5). Use the back arrow at the top to return.
 
 ---
 
@@ -166,6 +183,7 @@ Open **DonkeyHome** in the sidebar any time. Your previous answers are filled in
 | "That didn't work, but nothing was changed" | The message says why. Your old files are back. Click **Try again**; if it fails again, open **Settings > Apps > DonkeyHome > Log** and share it when you ask for help. |
 | "Someone has edited this Home Assistant's settings file by hand" | Someone added their own lines to `configuration.yaml`. DonkeyHome replaces that file (a copy is kept in `donkeyhome_backups`). If someone else set up your Home Assistant, ask them first. |
 | The page stays on "Waiting for Home Assistant to come back" | Wait 5 minutes, then refresh the browser. Everything was already set up; only the page lost track. |
-| A room card shows a red error | Open DonkeyHome again and click **Set up my home**: it recreates missing rooms. |
+| A room page is empty | Add devices and put them in that room (guide 3). |
+| The dashboard shows "Custom element doesn't exist: button-card" or plain fonts | The phone or browser still has the old page. Pull down to refresh, or close and reopen the app. Still wrong: in the app's **Settings > Companion app**, look for **Reset frontend cache**. |
 
 **Next:** [3. Adding devices](03-adding-devices.md)

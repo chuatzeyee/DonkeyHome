@@ -11,7 +11,8 @@ Run it again any time to change your answers; they are remembered.
 ## What it changes
 
 - Creates the rooms (areas) you chose, if they don't exist yet.
-- Writes `configuration.yaml`, the `packages/` files `house.yaml`, `routines.yaml`, `presence.yaml` and `maintenance.yaml`, and `dashboards/home.yaml`.
+- Writes `configuration.yaml`, the `packages/` files `house.yaml`, `routines.yaml`, `presence.yaml`, `look.yaml` and `maintenance.yaml`, and `dashboards/home.yaml`.
+- Adds the DonkeyHome look: `themes/donkeyhome.yaml` (dark and light) and `www/donkeyhome/` (button-card, the Google Sans and Instrument Serif fonts). The theme is applied to all of Home Assistant; the sun/moon button on the dashboard switches light and dark. To use another theme, pick it in your profile and delete `packages/look.yaml`.
 - Creates `automations.yaml`, `scripts.yaml` and `scenes.yaml` only if they are missing. Automations you made yourself are never touched.
 - Before writing, copies every file it changes into the `donkeyhome_backups` folder.
 - Asks Home Assistant to check the new setup. If the check fails, it puts your old files back and changes nothing.

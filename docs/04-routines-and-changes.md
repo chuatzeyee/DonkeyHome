@@ -28,7 +28,7 @@ For anything DonkeyHome asked (rooms, phones, the yes/no choices):
 1. Click **DonkeyHome** in the sidebar. Your previous answers are filled in.
 2. Change what you like, then click **Set up my home** on the last screen.
 
-DonkeyHome rewrites its own files each time (`configuration.yaml`, `packages/house.yaml`, `routines.yaml`, `presence.yaml`, `maintenance.yaml` and `dashboards/home.yaml`), so hand edits **in those files** are replaced. Keep your own additions in the Home Assistant screens (next section) or in your own package file (below). A copy of the old files is always kept in `donkeyhome_backups`.
+DonkeyHome rewrites its own files each time (`configuration.yaml`, `packages/house.yaml`, `routines.yaml`, `presence.yaml`, `look.yaml`, `maintenance.yaml`, `dashboards/home.yaml`, `themes/donkeyhome.yaml` and the `www/donkeyhome` folder), so hand edits **in those files** are replaced. Keep your own additions in the Home Assistant screens (next section) or in your own package file (below). A copy of the old files is always kept in `donkeyhome_backups`.
 
 ---
 
@@ -90,7 +90,7 @@ Note: running DonkeyHome again undoes this. Write your change down, or keep a co
 
 ## Your own package file
 
-For bigger additions that should survive DonkeyHome, make a new file in the `packages` folder with the File editor app, e.g. `packages/my_extras.yaml`. Every `.yaml` file there is loaded. DonkeyHome only writes `house.yaml`, `routines.yaml`, `presence.yaml` and `maintenance.yaml`, and leaves every other file alone.
+For bigger additions that should survive DonkeyHome, make a new file in the `packages` folder with the File editor app, e.g. `packages/my_extras.yaml`. Every `.yaml` file there is loaded. DonkeyHome only writes `house.yaml`, `routines.yaml`, `presence.yaml`, `look.yaml` and `maintenance.yaml`, and leaves every other file alone.
 
 ```yaml
 # packages/my_extras.yaml
@@ -117,6 +117,11 @@ The files are plain text. Three rules prevent nearly every mistake:
 Always run **Check configuration** before **Restart**. If it complains, it names the file and line; the mistake is on that line or the one above.
 
 ---
+
+## Light, dark, or your own theme
+
+- Tap the **sun/moon** button at the top right of your dashboard to switch between dark and light. It changes every screen of Home Assistant, on every phone.
+- Prefer another theme? Pick it under your **profile** (bottom left) > **Theme**, and delete `packages/look.yaml` (File editor app) so DonkeyHome stops setting its own at every start.
 
 ## Make the dashboard yours
 

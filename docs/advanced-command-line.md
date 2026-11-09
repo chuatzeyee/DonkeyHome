@@ -42,7 +42,7 @@ python3 donkeyhome/app/wizard.py --answers my-answers.json --yes
 
 Make a backup first (**Settings > System > Backups > Backup now**).
 
-Copy everything inside the `config` folder into Home Assistant's config folder (next to `.storage`), replacing `configuration.yaml`:
+Copy everything inside the `config` folder into Home Assistant's config folder (next to `.storage`), replacing `configuration.yaml`. That includes the `themes` and `www` folders (the DonkeyHome look):
 
 - **Home Assistant OS:** the **Samba share** app (`\\homeassistant\config` on Windows, `smb://homeassistant.local/config` on Mac) or the **Studio Code Server** app.
 - **Container:** the folder you mounted as `/config`.
@@ -69,4 +69,6 @@ python3 tests/integration_test.py         # real Home Assistant + the app contai
 python3 tests/integration_test.py --shots # also screenshots (needs Playwright)
 ```
 
-The app is `donkeyhome/`: `config.yaml` (app manifest), `Dockerfile`, and `app/` (`server.py` web server, `haclient.py` Home Assistant client, `wizard.py` file generator, `web/` the page). Standard library only, no build step.
+The app is `donkeyhome/`: `config.yaml` (app manifest), `Dockerfile`, and `app/` (`server.py` web server, `haclient.py` Home Assistant client, `wizard.py` file generator, `web/` the setup screens, `templates/dashboard.yaml` the dashboard, `assets/` theme, fonts and button-card copied into Home Assistant). Standard library only, no build step.
+
+The dashboard needs no entity IDs: button-card templates find each room's lights through the entity and device registries, and the room, Lights, Climate, Door and Media pages are Home Assistant's own view strategies (`home-area`, `light`, `climate`, `security`, `home-media-players`), styled by the theme.

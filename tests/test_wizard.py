@@ -89,11 +89,10 @@ class WizardTest(unittest.TestCase):
             self.assertIn(f"path: room-{room}", dash)
         self.assertIn("type: home-area", dash)
 
-    def test_licensed_canela_font_is_never_shipped(self):
-        for rel, data in wizard.build(answers()).items():
-            self.assertNotIn("canela", rel.lower())
-            if isinstance(data, str):
-                self.assertNotIn("Canela", data, rel)
+    def test_licensed_canela_font_files_are_never_shipped(self):
+        # Canela is the owner's licensed font: named in CSS, but the files never live in this repository.
+        self.assertFalse([rel for rel in wizard.build(answers()) if "canela" in rel.lower()])
+        self.assertFalse([p for p in ROOT.rglob("*") if "canela" in p.name.lower() and ".git" not in p.parts])
 
 
 class AppTest(unittest.TestCase):
@@ -126,6 +125,13 @@ class AppTest(unittest.TestCase):
         server.restore(folder, new)
         self.assertEqual((self.cfg / "configuration.yaml").read_text(), "old\n")
         self.assertFalse((self.cfg / "packages" / "routines.yaml").exists())
+
+    def test_owners_canela_is_found_and_copied(self):
+        self.assertEqual(server.find_canela(), {})
+        fonts = self.cfg / "www" / "fonts"
+        fonts.mkdir(parents=True, exist_ok=True)
+        (fonts / "Canela-Regular.woff2").write_bytes(b"font")
+        self.assertEqual(list(server.find_canela()), ["Canela-Regular.woff2"])
 
     def test_phone_label(self):
         self.assertEqual(server.phone_label("mobile_app_alex_iphone"), "Alex Iphone")

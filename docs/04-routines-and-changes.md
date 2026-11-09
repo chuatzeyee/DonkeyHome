@@ -123,6 +123,14 @@ Always run **Check configuration** before **Restart**. If it complains, it names
 - Tap the **sun/moon** button at the top right of your dashboard to switch between dark and light. It changes every screen of Home Assistant, on every phone.
 - Prefer another theme? Pick it under your **profile** (bottom left) > **Theme**, and delete `packages/look.yaml` (File editor app) so DonkeyHome stops setting its own at every start.
 
+## The Canela font (if you have a licence)
+
+DonkeyHome's big serif headings use **Canela** (by Commercial Type) when it is on your Home Assistant, and the free **Instrument Serif** otherwise. Canela is a paid font, so DonkeyHome can't include it. If you have a web licence for it:
+
+1. Put `Canela-Regular.woff2` (and `Canela-Thin.woff2` if you have it) in Home Assistant's `www/fonts/` folder, with the File editor or Samba share app.
+2. Open DonkeyHome and click **Set up my home** again. It copies them next to its other fonts.
+3. Refresh your phone's app or browser.
+
 ## Make the dashboard yours
 
 DonkeyHome's dashboard is a file (`dashboards/home.yaml`), so it is rewritten each time you run DonkeyHome. Two ways to customise:

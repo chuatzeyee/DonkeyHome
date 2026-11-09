@@ -3,12 +3,14 @@
 | File | Project | License |
 |---|---|---|
 | `button-card.js` | button-card v7.0.1, https://github.com/custom-cards/button-card | MIT |
+| `kiosk-mode.js` | kiosk-mode v15.0.0, https://github.com/NemesisRE/kiosk-mode | MIT |
 | `GoogleSans-latin.woff2` | Google Sans, from Google Fonts | SIL Open Font License 1.1 |
 | `InstrumentSerif-latin.woff2`, `InstrumentSerif-Italic-latin.woff2` | Instrument Serif by Instrument, from Google Fonts | SIL Open Font License 1.1 |
 
-## MIT License (button-card)
+## MIT License (button-card, kiosk-mode)
 
-Copyright (c) 2018 kuuji and the button-card contributors
+button-card: Copyright (c) 2018 kuuji and the button-card contributors.
+kiosk-mode: Copyright (c) 2019 maykar, (c) NemesisRE and the kiosk-mode contributors.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation the

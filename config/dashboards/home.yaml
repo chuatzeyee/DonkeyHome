@@ -5,6 +5,11 @@
 # Colours and fonts come from the DonkeyHome themes (themes/donkeyhome.yaml); the sun/moon button switches them.
 # Rooms: Living Room, Kitchen, Bedroom, Bathroom (Settings > Areas, labels and zones).
 
+# No Home Assistant top bar on the Home page (kiosk-mode, www/donkeyhome/kiosk-mode.js): the greeting has a Settings
+# button for admins instead. Add ?disable_km to the address to get the bar back for a moment.
+kiosk_mode:
+  hide_header: "[[[ panel_url === '/my-home' || panel_url === '/my-home/home' ]]]"
+
 button_card_templates:
   dh_base:
     show_icon: false
@@ -119,6 +124,18 @@ button_card_templates:
     hold_action:
       action: navigate
       navigation_path: "[[[ return '/my-home/' + variables.path ]]]"
+  # A routine: a slimmer pill (smaller icon circle, no second line) so the whole name fits two to a row on a phone.
+  dh_routine:
+    template: dh_pill
+    styles:
+      grid:
+        - padding: 6px 12px 6px 7px
+        - column-gap: 10px
+    custom_fields:
+      icon: >-
+        [[[ return `<div style="width:44px;height:44px;border-radius:50%;background:var(--dh-surface-2);display:flex;align-items:center;justify-content:center"><ha-icon icon="${variables.icon}" style="--mdc-icon-size:22px"></ha-icon></div>` ]]]
+      text: >-
+        [[[ return `<div style="font-size:15px;font-weight:500;line-height:1.2;white-space:normal">${variables.title}</div>` ]]]
   # A round icon button (the sun/moon switch).
   dh_circle:
     template: dh_base
@@ -200,14 +217,29 @@ views:
             - --ha-ripple-hover-opacity: 0
             - --ha-ripple-pressed-opacity: 0
           grid:
-            - grid-template-areas: '"hero mode"'
+            - grid-template-areas: '"hero mode" "hero settings"'
             - grid-template-columns: 1fr auto
+            - grid-template-rows: auto 1fr
             - align-items: start
             - column-gap: 12px
+            - row-gap: 10px
           custom_fields:
             hero: [justify-self: stretch, text-align: left, white-space: normal, overflow: visible, padding-left: 3px]
             mode: [align-self: start, padding-top: 6px]
+            settings: [align-self: start]
         custom_fields:
+          # No top bar on this page, so admins get the way to Settings here.
+          settings:
+            card:
+              type: custom:button-card
+              template: dh_circle
+              icon: mdi:cog-outline
+              tap_action:
+                action: navigate
+                navigation_path: /config
+              styles:
+                card:
+                  - display: "[[[ return user && user.is_admin ? 'block' : 'none' ]]]"
           mode:
             card:
               type: custom:button-card
@@ -342,8 +374,8 @@ views:
             heading: Routines
             heading_style: title
           - type: custom:button-card
-            template: dh_pill
-            variables: {icon: "mdi:weather-sunset-up", title: "Good Morning", subtitle: "Start the day"}
+            template: dh_routine
+            variables: {icon: "mdi:weather-sunset-up", title: "Good Morning"}
             tap_action:
               action: perform-action
               perform_action: script.turn_on
@@ -351,8 +383,8 @@ views:
                 entity_id: script.routine_good_morning
             grid_options: {columns: 6, rows: 1}
           - type: custom:button-card
-            template: dh_pill
-            variables: {icon: "mdi:exit-run", title: "Leaving Home", subtitle: "Switch off and lock"}
+            template: dh_routine
+            variables: {icon: "mdi:exit-run", title: "Leaving Home"}
             tap_action:
               action: perform-action
               perform_action: script.turn_on
@@ -360,8 +392,8 @@ views:
                 entity_id: script.routine_leaving_home
             grid_options: {columns: 6, rows: 1}
           - type: custom:button-card
-            template: dh_pill
-            variables: {icon: "mdi:home-import-outline", title: "I'm Home", subtitle: "Welcome back"}
+            template: dh_routine
+            variables: {icon: "mdi:home-import-outline", title: "I'm Home"}
             tap_action:
               action: perform-action
               perform_action: script.turn_on
@@ -369,8 +401,8 @@ views:
                 entity_id: script.routine_arriving_home
             grid_options: {columns: 6, rows: 1}
           - type: custom:button-card
-            template: dh_pill
-            variables: {icon: "mdi:weather-night", title: "Good Night", subtitle: "Lights off, doors locked"}
+            template: dh_routine
+            variables: {icon: "mdi:weather-night", title: "Good Night"}
             tap_action:
               action: perform-action
               perform_action: script.turn_on
@@ -378,8 +410,8 @@ views:
                 entity_id: script.routine_good_night
             grid_options: {columns: 6, rows: 1}
           - type: custom:button-card
-            template: dh_pill
-            variables: {icon: "mdi:power", title: "Everything Off", subtitle: "Lights, fans, aircon, TV"}
+            template: dh_routine
+            variables: {icon: "mdi:power", title: "Everything Off"}
             tap_action:
               action: perform-action
               perform_action: script.turn_on

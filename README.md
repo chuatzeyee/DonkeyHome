@@ -10,7 +10,7 @@ DonkeyHome is an app that runs inside Home Assistant. You tap through six friend
 <img src="docs/images/dashboard-room.png" alt="A room page" width="250">
 </p>
 
-- **A dashboard that feels like an app:** a greeting that tells you what's going on ("3 lights are on. The door is unlocked."), room pills that turn pink when a room's lights are on, one tap per room for its lights, a floating dock, and a page per room. Light and dark, switched with one button. Google Sans and Instrument Serif fonts.
+- **A dashboard that feels like an app:** a greeting that tells you what's going on ("3 lights are on. The door is unlocked."), room pills that turn pink when a room's lights are on, one tap per room for its lights, a floating dock, and a page per room. No top bar on Home. Light and dark, switched with one button. Google Sans, with Canela for headings if you have its licence (Instrument Serif otherwise).
 - **Five one-tap routines:** Good Morning, Leaving Home, I'm Home, Good Night, Everything Off.
 - **Automatic leave and arrive:** when the last phone leaves, the house switches off and tells you; when the first one comes back, the arrival room lights up after dark.
 - **Phone messages** through the Home Assistant app, and a weekly list of batteries to change.
@@ -68,4 +68,4 @@ tests/                 offline checks, plus an end-to-end test with a real Home 
 
 ## License
 
-MIT. See [LICENSE](LICENSE). Bundled: button-card (MIT), Google Sans and Instrument Serif (SIL Open Font License), Material Design Icons (Pictogrammers Free License); details in `donkeyhome/app/assets/www/donkeyhome/LICENSES.md`.
+MIT. See [LICENSE](LICENSE). Bundled: button-card and kiosk-mode (MIT), Google Sans and Instrument Serif (SIL Open Font License), Material Design Icons (Pictogrammers Free License); details in `donkeyhome/app/assets/www/donkeyhome/LICENSES.md`. Canela (Commercial Type) is not included; DonkeyHome uses your own licensed copy if you add it.

@@ -1,10 +1,11 @@
 # DonkeyHome themes. "DonkeyHome" is dark, "DonkeyHome Light" is light; the sun/moon button on the
 # dashboard switches between them (script.donkeyhome_toggle_theme). Fonts: Google Sans and Instrument Serif,
-# served from www/donkeyhome/ (SIL Open Font License). Colour means "on"; everything off is grey.
+# served from www/donkeyhome/ (SIL Open Font License); Canela instead of Instrument Serif when its licensed font
+# files are there. Colour means "on"; everything off is grey.
 DonkeyHome:
   ha-font-family-body: '"Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
   ha-font-family-heading: '"Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-  dh-font-display: '"Instrument Serif", Georgia, serif'
+  dh-font-display: '"Canela", "Instrument Serif", Georgia, serif'
   ha-font-size-scale: "1.1"
   ha-font-weight-heading: "600"
   ha-heading-card-title-font-size: "15px"
@@ -35,6 +36,7 @@ DonkeyHome:
   state-inactive-color: "#6E7180"
   app-header-background-color: "#1A1A1C"
   app-header-text-color: "#F2F2F4"
+  app-header-border-bottom: "none"
   app-header-selection-bar-color: "#F2A7CF"
   sidebar-background-color: "#1A1A1C"
   sidebar-text-color: "#F2F2F4"
@@ -129,7 +131,7 @@ DonkeyHome:
 DonkeyHome Light:
   ha-font-family-body: '"Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
   ha-font-family-heading: '"Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-  dh-font-display: '"Instrument Serif", Georgia, serif'
+  dh-font-display: '"Canela", "Instrument Serif", Georgia, serif'
   ha-font-size-scale: "1.1"
   ha-font-weight-heading: "600"
   ha-heading-card-title-font-size: "15px"
@@ -158,8 +160,9 @@ DonkeyHome Light:
   text-primary-color: "#2A1220"
   state-icon-color: "#7A7A82"
   state-inactive-color: "#6E7180"
-  app-header-background-color: "#F7F7F8"
+  app-header-background-color: "#F6F6F7"
   app-header-text-color: "#141416"
+  app-header-border-bottom: "none"
   app-header-selection-bar-color: "#F2A7CF"
   sidebar-background-color: "#F7F7F8"
   sidebar-text-color: "#141416"

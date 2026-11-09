@@ -34,7 +34,7 @@ MARKER = "# Made by DonkeyHome."
 HERE = Path(__file__).resolve().parent
 TEMPLATES = HERE / "templates"
 ASSETS = HERE / "assets"  # copied as-is into the config folder: theme, fonts, button-card
-ASSET_VERSION = "2"  # bump when anything in assets/www changes, so browsers fetch the new files
+ASSET_VERSION = "3"  # bump when anything in assets/www changes, so browsers fetch the new files
 UI_FILES = ("automations.yaml", "scripts.yaml", "scenes.yaml")  # created if missing, never overwritten
 OPTIONAL_FILES = ("packages/maintenance.yaml",)  # removed again when switched off (only if DonkeyHome made it)
 
@@ -205,10 +205,11 @@ default_config:
 frontend:
   # Themes from the themes folder, including the DonkeyHome light and dark themes.
   themes: !include_dir_merge_named themes
-  # The DonkeyHome look: button-card (www/donkeyhome/button-card.js, MIT) and the Google Sans and
-  # Instrument Serif fonts (www/donkeyhome/fonts.css, SIL Open Font License).
+  # The DonkeyHome look: button-card (MIT), kiosk-mode (MIT, hides the top bar on the Home page) and the
+  # fonts (www/donkeyhome/fonts.css). All in www/donkeyhome/, see LICENSES.md there.
   extra_module_url:
     - /local/donkeyhome/button-card.js?v={ASSET_VERSION}
+    - /local/donkeyhome/kiosk-mode.js?v={ASSET_VERSION}
     - /local/donkeyhome/fonts.js?v={ASSET_VERSION}
 
 homeassistant:
@@ -431,11 +432,11 @@ def dashboard_yaml(a: dict) -> str:
         f"            variables: {{name: {q(r)}, area: {area_of(a, r)}, path: {room_path(a, r)}}}\n"
         f"            grid_options: {{columns: 6, rows: 1}}" for r in a["rooms"])
     routines = "\n".join(
-        f"          - type: custom:button-card\n            template: dh_pill\n"
-        f"            variables: {{icon: \"{icon}\", title: {q(label)}, subtitle: {q(sub)}}}\n"
+        f"          - type: custom:button-card\n            template: dh_routine\n"
+        f"            variables: {{icon: \"{icon}\", title: {q(label)}}}\n"
         f"            tap_action:\n              action: perform-action\n              perform_action: script.turn_on\n"
         f"              target:\n                entity_id: script.{key}\n            grid_options: {{columns: 6, rows: 1}}"
-        for key, label, icon, sub in ROUTINES)
+        for key, label, icon in ROUTINES)
     text = (TEMPLATES / "dashboard.yaml").read_text(encoding="utf-8")
     for key, value in {"@@MARKER@@": MARKER, "@@HOME@@": a["home_name"], "@@ROOM_LIST@@": ", ".join(a["rooms"]),
                        "@@PILL_AREAS@@": " ".join(keys), "@@ROOM_COUNT@@": str(len(keys)),
@@ -445,11 +446,11 @@ def dashboard_yaml(a: dict) -> str:
     return text
 
 
-ROUTINES = (("routine_good_morning", "Good Morning", "mdi:weather-sunset-up", "Start the day"),
-            ("routine_leaving_home", "Leaving Home", "mdi:exit-run", "Switch off and lock"),
-            ("routine_arriving_home", "I'm Home", "mdi:home-import-outline", "Welcome back"),
-            ("routine_good_night", "Good Night", "mdi:weather-night", "Lights off, doors locked"),
-            ("routine_everything_off", "Everything Off", "mdi:power", "Lights, fans, aircon, TV"))
+ROUTINES = (("routine_good_morning", "Good Morning", "mdi:weather-sunset-up"),
+            ("routine_leaving_home", "Leaving Home", "mdi:exit-run"),
+            ("routine_arriving_home", "I'm Home", "mdi:home-import-outline"),
+            ("routine_good_night", "Good Night", "mdi:weather-night"),
+            ("routine_everything_off", "Everything Off", "mdi:power"))
 
 
 def look_yaml(a: dict) -> str:

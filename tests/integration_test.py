@@ -181,6 +181,10 @@ def main() -> int:
                         "-e", "DATA_DIR=/tmp/data", "-v", f"{cfg}:/homeassistant", "donkeyhome-test"],
                        check=True, stdout=subprocess.DEVNULL)
 
+        canela = Path(os.environ.get("CANELA_DIR", "/nonexistent"))  # optional: the owner's licensed Canela, local only
+        for font in sorted(canela.glob("Canela-*.woff2")):
+            subprocess.run(["docker", "exec", ha_name, "mkdir", "-p", "/config/www/fonts"], check=True)
+            subprocess.run(["docker", "cp", str(font), f"{ha_name}:/config/www/fonts/{font.name}"], check=True)
         info = wait(lambda: http("GET", APP + "/api/discover"), "DonkeyHome to answer")
         check(info["ok"], "discover answers")
         names = [a["name"] for a in info["data"]["areas"]]

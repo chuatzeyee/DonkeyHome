@@ -1,24 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="DonkeyHome">
-  <rect x="4" y="4" width="120" height="120" rx="30" fill="#f5e3d3"/>
-  <!-- roof -->
-  <path d="M18 62 L64 22 L110 62" fill="none" stroke="#b5652b" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- ears -->
-  <path d="M45 66 C36 44 36 30 42 26 C49 30 54 46 55 62 Z" fill="#8a7a6c"/>
-  <path d="M46 61 C41 46 41 36 43 32 C47 37 50 48 51 59 Z" fill="#e8c9b4"/>
-  <path d="M83 66 C92 44 92 30 86 26 C79 30 74 46 73 62 Z" fill="#8a7a6c"/>
-  <path d="M82 61 C87 46 87 36 85 32 C81 37 78 48 77 59 Z" fill="#e8c9b4"/>
-  <!-- head -->
-  <ellipse cx="64" cy="78" rx="25" ry="28" fill="#9d8d7f"/>
-  <!-- mane -->
-  <path d="M56 54 C58 47 62 46 64 52 C66 46 70 47 72 54 Z" fill="#4a3f36"/>
-  <!-- muzzle -->
-  <ellipse cx="64" cy="94" rx="19" ry="14" fill="#e9ded2"/>
-  <ellipse cx="57" cy="93" rx="2.6" ry="3.4" fill="#4a3f36"/>
-  <ellipse cx="71" cy="93" rx="2.6" ry="3.4" fill="#4a3f36"/>
-  <path d="M58 101 Q64 105 70 101" fill="none" stroke="#4a3f36" stroke-width="2.4" stroke-linecap="round"/>
-  <!-- eyes -->
-  <circle cx="54" cy="74" r="4.2" fill="#2b2620"/>
-  <circle cx="74" cy="74" r="4.2" fill="#2b2620"/>
-  <circle cx="55.4" cy="72.6" r="1.4" fill="#fff"/>
-  <circle cx="75.4" cy="72.6" r="1.4" fill="#fff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="DonkeyHome">
+  <rect width="512" height="512" rx="116" fill="#1A1A1C"/>
+  <path d="M70 250 L256 92 L442 250" fill="none" stroke="#F2A7CF" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="rotate(-20 200 226)">
+    <path d="M200 96 C226 120 236 190 230 262 L170 262 C164 190 174 120 200 96 Z" fill="#A9A6AE"/>
+    <path d="M200 96 C214 108 220 124 222 140 L178 140 C180 124 186 108 200 96 Z" fill="#3A3A3E"/>
+    <path d="M200 150 C212 172 214 214 210 246 L190 246 C186 214 188 172 200 150 Z" fill="#E9C3D6"/>
+  </g>
+  <g transform="rotate(20 312 226)">
+    <path d="M312 96 C338 120 348 190 342 262 L282 262 C276 190 286 120 312 96 Z" fill="#A9A6AE"/>
+    <path d="M312 96 C326 108 332 124 334 140 L290 140 C292 124 298 108 312 96 Z" fill="#3A3A3E"/>
+    <path d="M312 150 C324 172 326 214 322 246 L302 246 C298 214 300 172 312 150 Z" fill="#E9C3D6"/>
+  </g>
+  <path d="M256 214 C318 214 354 252 354 312 C354 352 344 392 330 424 C318 450 290 464 256 464 C222 464 194 450 182 424 C168 392 158 352 158 312 C158 252 194 214 256 214 Z" fill="#A9A6AE"/>
+  <path d="M232 222 L244 188 L256 216 L268 188 L280 222 Z" fill="#3A3A3E"/>
+  <path d="M256 352 C306 352 334 372 334 404 C334 440 300 462 256 462 C212 462 178 440 178 404 C178 372 206 352 256 352 Z" fill="#F4F4F5"/>
+  <ellipse cx="228" cy="398" rx="9" ry="13" fill="#3A3A3E"/>
+  <ellipse cx="284" cy="398" rx="9" ry="13" fill="#3A3A3E"/>
+  <circle cx="206" cy="300" r="14" fill="#1A1A1C"/>
+  <circle cx="306" cy="300" r="14" fill="#1A1A1C"/>
+  <circle cx="211" cy="295" r="4.5" fill="#F4F4F5"/>
+  <circle cx="311" cy="295" r="4.5" fill="#F4F4F5"/>
 </svg>

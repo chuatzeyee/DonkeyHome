@@ -1,8 +1,14 @@
 /* DonkeyHome fonts, served from this Home Assistant (no internet needed).
-   Google Sans and Instrument Serif: SIL Open Font License 1.1 (see LICENSES.md), latin subset. */
+   Google Sans and Instrument Serif: SIL Open Font License 1.1 (see LICENSES.md), latin subset.
+   Canela (Commercial Type) is the display serif when you have a licence for it: DonkeyHome copies your
+   Canela-Regular.woff2 and Canela-Thin.woff2 here from www/fonts/. Without them, Instrument Serif is used. */
 @font-face { font-family: "Google Sans"; font-style: normal; font-weight: 400 700; font-display: swap;
   src: url("GoogleSans-latin.woff2") format("woff2"); }
 @font-face { font-family: "Instrument Serif"; font-style: normal; font-weight: 400; font-display: swap;
   src: url("InstrumentSerif-latin.woff2") format("woff2"); }
+@font-face { font-family: "Canela"; font-style: normal; font-weight: 100 300; font-display: swap;
+  src: url("Canela-Thin.woff2") format("woff2"); }
+@font-face { font-family: "Canela"; font-style: normal; font-weight: 400 700; font-display: swap;
+  src: url("Canela-Regular.woff2") format("woff2"); }
 @font-face { font-family: "Instrument Serif"; font-style: italic; font-weight: 400; font-display: swap;
   src: url("InstrumentSerif-Italic-latin.woff2") format("woff2"); }

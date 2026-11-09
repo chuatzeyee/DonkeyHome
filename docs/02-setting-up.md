@@ -115,6 +115,7 @@ What's on it, top to bottom:
 |---|---|
 | **The greeting** | Says what's going on: the weather, how many lights are on, the aircon, whether the door is locked. Tap a dark pill to see more. A red pill means something needs you (like an unlocked door). |
 | **Sun/moon button** (top right) | Switches between dark and light. |
+| **Gear button** (under it, admins only) | Opens Settings. The Home page has no top bar, so this is the way to Settings and the menu. |
 | **Room pills** | One per room. Pink means a light is on in that room. Tap to open the room's page. |
 | **House mode** and **Auto leave** | Home, Away or Night; and the automatic leave and arrive switch (Step 6). |
 | **Lights** | One pill per room. Tap to switch that room's lights on or off. Press and hold to open the room. |
@@ -122,6 +123,8 @@ What's on it, top to bottom:
 | **The dock** (floating at the bottom) | Home, Lights, Climate, Door, and Music and TV. |
 
 Each room page, and the Lights, Climate, Door and Media pages, fill themselves with the devices you add (Step 5). Use the back arrow at the top to return.
+
+Need Home Assistant's usual top bar on the Home page for a moment? Add `?disable_km` to the address, like `http://homeassistant.local/my-home/home?disable_km`.
 
 ---
 

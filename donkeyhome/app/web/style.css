@@ -5,6 +5,9 @@
   src: url("fonts/GoogleSans-latin.woff2") format("woff2"); }
 @font-face { font-family: "Instrument Serif"; font-style: normal; font-weight: 400; font-display: swap;
   src: url("fonts/InstrumentSerif-latin.woff2") format("woff2"); }
+/* Canela when this Home Assistant has the licensed files (see server.py); otherwise Instrument Serif. */
+@font-face { font-family: "Canela"; font-style: normal; font-weight: 400 700; font-display: swap;
+  src: url("fonts/Canela-Regular.woff2") format("woff2"); }
 
 :root {
   --bg: radial-gradient(120% 90% at 50% 0%, #F7F7F8 0%, #E9E9EC 100%);
@@ -25,7 +28,7 @@
   --dock: #F4F4F5;
   --dock-ink: #1C1C1E;
   --shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-  --serif: "Instrument Serif", Georgia, serif;
+  --serif: "Canela", "Instrument Serif", Georgia, serif;
   --sans: "Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color-scheme: light dark;
 }

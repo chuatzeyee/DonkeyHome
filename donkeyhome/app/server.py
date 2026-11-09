@@ -36,6 +36,22 @@ STATIC = {"/": (WEB / "index.html", "text/html"), "/app.js": (WEB / "app.js", "t
           "/donkey.svg": (WEB / "donkey.svg", "image/svg+xml"),
           **{f"/fonts/{f}": (FONTS / f, "font/woff2") for f in
              ("GoogleSans-latin.woff2", "InstrumentSerif-latin.woff2", "InstrumentSerif-Italic-latin.woff2")}}
+# Canela is licensed, so it is never part of DonkeyHome: it is used when the owner has put the files on this
+# Home Assistant, in www/donkeyhome/ or www/fonts/ (checked in that order).
+CANELA = ("Canela-Regular.woff2", "Canela-Thin.woff2")
+CANELA_DIRS = ("www/donkeyhome", "www/fonts")
+
+
+def find_canela() -> dict[str, Path]:
+    """{file name: path} of the owner's Canela files, if present."""
+    found = {}
+    for name in CANELA:
+        for folder in CANELA_DIRS:
+            path = CONFIG_DIR / folder / name
+            if path.is_file():
+                found[name] = path
+                break
+    return found
 MAX_BODY = 64 * 1024
 DEVICE_DOMAINS = ("light", "fan", "climate", "media_player", "lock", "cover", "vacuum")
 # Lines of Home Assistant's own starting configuration.yaml (comments and blank lines ignored).
@@ -137,7 +153,8 @@ def apply(raw: dict) -> dict[str, Any]:
     answers = wizard.validate(raw)
     steps: list[str] = []
     answers = wizard.validate({**answers, "area_ids": ensure_areas(answers["rooms"], steps)})
-    files = wizard.build(answers)
+    files = {**wizard.build(answers),  # the owner's licensed Canela travels into www/donkeyhome/ with the look
+             **{f"www/donkeyhome/{name}": path.read_bytes() for name, path in find_canela().items()}}
     to_write, to_delete = wizard.plan(files, CONFIG_DIR)
     folder, new = backup(list(to_write) + to_delete)
     steps.append(f"Saved a backup of your old files in {folder.relative_to(CONFIG_DIR)}")
@@ -207,8 +224,9 @@ class Handler(BaseHTTPRequestHandler):
         if not self._allowed():
             return
         path = self.path.split("?", 1)[0]
-        if path in STATIC:
-            file, ctype = STATIC[path]
+        canela = find_canela().get(path.removeprefix("/fonts/")) if path.startswith("/fonts/Canela") else None
+        if path in STATIC or canela:
+            file, ctype = STATIC[path] if path in STATIC else (canela, "font/woff2")
             body = file.read_bytes()
             self.send_response(200)
             self.send_header("Content-Type", ctype if ctype.startswith("font/") else ctype + "; charset=utf-8")

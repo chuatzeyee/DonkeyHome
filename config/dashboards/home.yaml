@@ -1,0 +1,60 @@
+# The Our Home dashboard. Room cards need the areas to exist with exactly these names:
+# Living Room, Kitchen, Bedroom, Bathroom (Settings > Areas, labels and zones).
+
+title: "Our Home"
+views:
+  - title: Home
+    path: home
+    icon: mdi:home
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Routines
+          - type: button
+            entity: script.routine_good_morning
+            show_state: false
+            tap_action:
+              action: toggle
+          - type: button
+            entity: script.routine_leaving_home
+            show_state: false
+            tap_action:
+              action: toggle
+          - type: button
+            entity: script.routine_arriving_home
+            show_state: false
+            tap_action:
+              action: toggle
+          - type: button
+            entity: script.routine_good_night
+            show_state: false
+            tap_action:
+              action: toggle
+          - type: button
+            entity: script.routine_everything_off
+            show_state: false
+            tap_action:
+              action: toggle
+      - type: grid
+        cards:
+          - type: heading
+            heading: House
+          - type: tile
+            entity: input_select.house_mode
+          - type: tile
+            entity: input_boolean.auto_presence
+      - type: grid
+        cards:
+          - type: heading
+            heading: Rooms
+          - type: area
+            area: living_room
+          - type: area
+            area: kitchen
+          - type: area
+            area: bedroom
+          - type: area
+            area: bathroom

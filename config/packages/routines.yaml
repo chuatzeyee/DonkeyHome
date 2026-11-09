@@ -1,0 +1,136 @@
+# The one-tap routines. Each device step has continue_on_error, so one offline device never
+# stops a routine. 'entity_id: all' means every device of that kind, so new devices are
+# included automatically. To change a routine, edit this file or run the wizard again.
+
+script:
+  routine_good_morning:
+    alias: "Good Morning"
+    icon: mdi:weather-sunset-up
+    description: "House mode Home."
+    mode: restart
+    sequence:
+      - alias: "House mode Home"
+        action: input_select.select_option
+        target:
+          entity_id: input_select.house_mode
+        data:
+          option: Home
+
+  routine_leaving_home:
+    alias: "Leaving Home"
+    icon: mdi:exit-run
+    description: "House mode Away and switches the house off as chosen in the wizard."
+    mode: restart
+    sequence:
+      - alias: "House mode Away"
+        action: input_select.select_option
+        target:
+          entity_id: input_select.house_mode
+        data:
+          option: Away
+      - alias: "Lights off"
+        action: light.turn_off
+        target:
+          entity_id: all
+        continue_on_error: true
+      - alias: "Aircon and heating off"
+        action: climate.turn_off
+        target:
+          entity_id: all
+        continue_on_error: true
+      - alias: "Fans off"
+        action: fan.turn_off
+        target:
+          entity_id: all
+        continue_on_error: true
+      - alias: "TVs and speakers off"
+        action: media_player.turn_off
+        target:
+          entity_id: all
+        continue_on_error: true
+      - alias: "Lock the doors"
+        action: lock.lock
+        target:
+          entity_id: all
+        continue_on_error: true
+      - action: script.notify_everyone
+        data:
+          message: Everyone has left. The house is switched off.
+
+  routine_arriving_home:
+    alias: "I'm Home"
+    icon: mdi:home-import-outline
+    description: "House mode Home; Living Room lights on if it is dark."
+    mode: restart
+    sequence:
+      - alias: "House mode Home"
+        action: input_select.select_option
+        target:
+          entity_id: input_select.house_mode
+        data:
+          option: Home
+      - alias: "Living Room lights on if it is dark"
+        if:
+          - condition: state
+            entity_id: sun.sun
+            state: below_horizon
+        then:
+          - action: light.turn_on
+            target:
+              area_id: living_room
+            continue_on_error: true
+
+  routine_good_night:
+    alias: "Good Night"
+    icon: mdi:weather-night
+    description: "House mode Night, lights and TVs off, doors locked, blinds closed (as chosen)."
+    mode: restart
+    sequence:
+      - alias: "House mode Night"
+        action: input_select.select_option
+        target:
+          entity_id: input_select.house_mode
+        data:
+          option: Night
+      - alias: "Lock the doors"
+        action: lock.lock
+        target:
+          entity_id: all
+        continue_on_error: true
+      - alias: "Lights off"
+        action: light.turn_off
+        target:
+          entity_id: all
+        continue_on_error: true
+      - alias: "TVs off"
+        action: media_player.turn_off
+        target:
+          entity_id: all
+        continue_on_error: true
+
+  routine_everything_off:
+    alias: "Everything Off"
+    icon: mdi:power
+    description: "Lights, fans, aircon, TVs and speakers off. Nothing else changes."
+    mode: restart
+    sequence:
+      - alias: "Lights off"
+        action: light.turn_off
+        target:
+          entity_id: all
+        continue_on_error: true
+      - alias: "Fans off"
+        action: fan.turn_off
+        target:
+          entity_id: all
+        continue_on_error: true
+      - alias: "Aircon and heating off"
+        action: climate.turn_off
+        target:
+          entity_id: all
+        continue_on_error: true
+      - alias: "TVs and speakers off"
+        action: media_player.turn_off
+        target:
+          entity_id: all
+        continue_on_error: true

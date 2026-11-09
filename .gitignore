@@ -1,0 +1,4 @@
+# Your own answers can include names; keep them off GitHub.
+my-answers.json
+__pycache__/
+.venv/

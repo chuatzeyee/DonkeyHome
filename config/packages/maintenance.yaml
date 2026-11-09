@@ -1,0 +1,20 @@
+# Weekly check-up: Sunday 10:00, lists every battery under 20 %.
+
+automation:
+  - id: weekly_battery_check
+    alias: "Weekly check: low batteries"
+    triggers:
+      - trigger: time
+        at: "10:00:00"
+    conditions:
+      - condition: time
+        weekday: sun
+    actions:
+      - variables:
+          low: >-
+            {% set ns = namespace(low=[]) %}{% for s in states.sensor if s.attributes.device_class == 'battery' and s.state | is_number and s.state | float < 20 %}{% set ns.low = ns.low + [s.name ~ ' (' ~ s.state ~ '%)'] %}{% endfor %}{{ ns.low | join(', ') }}
+      - condition: template
+        value_template: "{{ low != '' }}"
+      - action: script.notify_everyone
+        data:
+          message: "Batteries to change: {{ low }}"

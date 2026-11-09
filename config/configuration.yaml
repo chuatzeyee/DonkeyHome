@@ -1,0 +1,24 @@
+# Home Assistant configuration made by the starter wizard for Our Home.
+# Most of the logic lives in packages/ (one file per subject). This file just switches things on.
+# After you edit any YAML file: Settings > Tools > YAML > Check configuration, then Restart.
+
+# The standard Home Assistant features (history, logbook, phone app, sun, zones, backups and more).
+default_config:
+
+homeassistant:
+  # Every .yaml file in packages/ is loaded automatically.
+  packages: !include_dir_named packages
+
+lovelace:
+  dashboards:
+    my-home:
+      mode: yaml
+      filename: dashboards/home.yaml
+      title: "Our Home"
+      icon: mdi:home
+      show_in_sidebar: true
+
+# Automations, scripts and scenes you make in the Home Assistant screens are saved in these files.
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml

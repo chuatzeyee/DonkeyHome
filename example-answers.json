@@ -1,0 +1,15 @@
+{
+  "home_name": "Our Home",
+  "people": ["Alex", "Sam"],
+  "rooms": ["Living Room", "Kitchen", "Bedroom", "Bathroom"],
+  "arrival_room": "Living Room",
+  "notify": [],
+  "leave_delay_minutes": 10,
+  "lights_off_when_leaving": true,
+  "climate_off_when_leaving": true,
+  "media_off_when_leaving": true,
+  "lock_when_leaving": true,
+  "vacuum_when_away": false,
+  "blinds": false,
+  "battery_check": true
+}

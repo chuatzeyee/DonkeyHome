@@ -1,0 +1,35 @@
+# House mode, the automatic leave/arrive switch and the "notify everyone" helper.
+
+input_select:
+  house_mode:
+    name: House mode
+    icon: mdi:home-switch
+    options:
+      - Home
+      - Away
+      - Night
+
+input_boolean:
+  auto_presence:
+    # Off until your phones are set up (docs/02-setting-up.md, step 8).
+    name: Automatic leave and arrive
+    icon: mdi:map-marker-radius
+
+script:
+  notify_everyone:
+    alias: Notify everyone
+    icon: mdi:message-alert
+    description: Sends a message to every phone listed in the wizard, and always to the bell icon in Home Assistant.
+    mode: queued
+    fields:
+      message:
+        description: What to say
+        example: The front door is open
+        required: true
+        selector:
+          text:
+    sequence:
+      - action: persistent_notification.create
+        data:
+          title: "Our Home"
+          message: "{{ message }}"

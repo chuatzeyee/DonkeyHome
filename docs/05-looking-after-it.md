@@ -65,13 +65,13 @@ The phone app's notifications work away from home without any of these. Location
 | Problem | Try this |
 |---|---|
 | Home Assistant page won't open | Is the box on and its network cable in? Wait 5 minutes after a power cut. Try the IP address instead of `homeassistant.local`. |
-| It opens in **Recovery mode** | A YAML file has a mistake. Use the File editor link it offers, or copy the kit's `config` again (guide 2, Step 4c), then restart. |
+| It opens in **Recovery mode** | A YAML file has a mistake, usually from a hand edit. Open **DonkeyHome** and click **Set up my home** again to rewrite its files cleanly. Or restore a backup (above). |
 | A device is **Unavailable** | Restart the device. Then **Settings > Devices and services** > its integration > three dots > **Reload**. |
 | A routine "does nothing" for one device | Open **Settings > Automations and scenes > Scripts** > the routine > three dots > **Traces**. Each step shows what happened; a red step names the device that failed. |
 | Leaving Home runs while someone is home | Their phone stopped reporting location. In the phone's settings allow the Home Assistant app location **Always** and turn off battery saving for it. Meanwhile turn off **Automatic leave and arrive**. |
 | I'm Home didn't run | It only runs when the house mode is **Away**. Check the house mode on the dashboard. |
 | No weekly battery message | It only sends one when something is under 20 %. |
-| I said "no" to the weekly battery check, but still get it | Delete `packages/maintenance.yaml` in the share (copying never deletes old files), then restart. |
+| I want to undo DonkeyHome's last change | Copy the files from the newest folder in `donkeyhome_backups` back with the File editor app, then restart. Or restore a Home Assistant backup (above). |
 | The box is slow or full | **Settings > System > Repairs** and **Settings > System > Storage**. Old backups and a large history use space; reduce how many backups are kept. |
 
 **Asking for help:** the community forum <https://community.home-assistant.io> and the Discord are friendly. Say which Home Assistant version you have (**Settings > About**) and paste the error from **Settings > System > Logs**.

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="DonkeyHome">
+  <rect x="4" y="4" width="120" height="120" rx="30" fill="#f5e3d3"/>
+  <!-- roof -->
+  <path d="M18 62 L64 22 L110 62" fill="none" stroke="#b5652b" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- ears -->
+  <path d="M45 66 C36 44 36 30 42 26 C49 30 54 46 55 62 Z" fill="#8a7a6c"/>
+  <path d="M46 61 C41 46 41 36 43 32 C47 37 50 48 51 59 Z" fill="#e8c9b4"/>
+  <path d="M83 66 C92 44 92 30 86 26 C79 30 74 46 73 62 Z" fill="#8a7a6c"/>
+  <path d="M82 61 C87 46 87 36 85 32 C81 37 78 48 77 59 Z" fill="#e8c9b4"/>
+  <!-- head -->
+  <ellipse cx="64" cy="78" rx="25" ry="28" fill="#9d8d7f"/>
+  <!-- mane -->
+  <path d="M56 54 C58 47 62 46 64 52 C66 46 70 47 72 54 Z" fill="#4a3f36"/>
+  <!-- muzzle -->
+  <ellipse cx="64" cy="94" rx="19" ry="14" fill="#e9ded2"/>
+  <ellipse cx="57" cy="93" rx="2.6" ry="3.4" fill="#4a3f36"/>
+  <ellipse cx="71" cy="93" rx="2.6" ry="3.4" fill="#4a3f36"/>
+  <path d="M58 101 Q64 105 70 101" fill="none" stroke="#4a3f36" stroke-width="2.4" stroke-linecap="round"/>
+  <!-- eyes -->
+  <circle cx="54" cy="74" r="4.2" fill="#2b2620"/>
+  <circle cx="74" cy="74" r="4.2" fill="#2b2620"/>
+  <circle cx="55.4" cy="72.6" r="1.4" fill="#fff"/>
+  <circle cx="75.4" cy="72.6" r="1.4" fill="#fff"/>
+</svg>

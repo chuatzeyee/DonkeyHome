@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DonkeyHome</title>
+  <link rel="icon" href="donkey.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="top">
+      <img src="donkey.svg" alt="" width="40" height="40">
+      <span class="brand">DonkeyHome</span>
+      <ol class="progress" id="progress" aria-label="Progress"></ol>
+    </header>
+    <section id="screen" class="card" aria-live="polite">
+      <p class="muted">Loading...</p>
+    </section>
+    <noscript><p class="card">DonkeyHome needs JavaScript. Please allow it for this page.</p></noscript>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

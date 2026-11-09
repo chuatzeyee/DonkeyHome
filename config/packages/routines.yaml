@@ -1,3 +1,4 @@
+# Made by DonkeyHome.
 # The one-tap routines. Each device step has continue_on_error, so one offline device never
 # stops a routine. 'entity_id: all' means every device of that kind, so new devices are
 # included automatically. To change a routine, edit this file or run the wizard again.

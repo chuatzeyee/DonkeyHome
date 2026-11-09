@@ -21,21 +21,20 @@ You can see all of them in Home Assistant under **Settings > Automations and sce
 
 ---
 
-## The easy way to change things: run the wizard again
+## The easy way to change things: open DonkeyHome again
 
-For anything the wizard asked (rooms, people, phones, the yes/no choices):
+For anything DonkeyHome asked (rooms, phones, the yes/no choices):
 
-1. Run the wizard (guide 2, Step 2). Press Enter to keep answers you don't want to change.
-2. Copy the kit's `config` contents into the share again (guide 2, Step 4c). If you only changed choices or phones, copying the `packages` folder is enough; for rooms or the home name, also copy `dashboards` and `configuration.yaml`.
-3. **Check configuration** > **Restart** (guide 2, Step 5).
+1. Click **DonkeyHome** in the sidebar. Your previous answers are filled in.
+2. Change what you like, then click **Set up my home** on the last screen.
 
-The wizard always rewrites the files from scratch, so any hand edits inside the kit's `config` folder are replaced. Keep your own additions in the Home Assistant screens (next section) or in your own package file (last section).
+DonkeyHome rewrites its own files each time (`configuration.yaml`, `packages/house.yaml`, `routines.yaml`, `presence.yaml`, `maintenance.yaml` and `dashboards/home.yaml`), so hand edits **in those files** are replaced. Keep your own additions in the Home Assistant screens (next section) or in your own package file (below). A copy of the old files is always kept in `donkeyhome_backups`.
 
 ---
 
 ## Add your own automations (no files needed)
 
-Make new automations in the Home Assistant screens. They're saved in `automations.yaml`, which the wizard never touches once you stop copying it (see the note in guide 2, Step 4c).
+Make new automations in the Home Assistant screens. They're saved in `automations.yaml`, which DonkeyHome never touches.
 
 Example: a lamp on at sunset.
 
@@ -85,13 +84,13 @@ The routines use `entity_id: all`, meaning "every light" or "every fan". To leav
 
 4. **Save**, then **Check configuration** > **Restart**.
 
-Note: running the wizard and copying `packages` again undoes this. Write your change down, or keep a copy of the file.
+Note: running DonkeyHome again undoes this. Write your change down, or keep a copy of the file.
 
 ---
 
 ## Your own package file
 
-For bigger additions that should survive the wizard, make a new file in the `packages` folder **on Home Assistant** (not in the kit), e.g. `packages/my_extras.yaml`. Every `.yaml` file there is loaded. The wizard only writes `house.yaml`, `routines.yaml`, `presence.yaml` and `maintenance.yaml`; other files in the share are left alone when you copy.
+For bigger additions that should survive DonkeyHome, make a new file in the `packages` folder with the File editor app, e.g. `packages/my_extras.yaml`. Every `.yaml` file there is loaded. DonkeyHome only writes `house.yaml`, `routines.yaml`, `presence.yaml` and `maintenance.yaml`, and leaves every other file alone.
 
 ```yaml
 # packages/my_extras.yaml
@@ -121,9 +120,9 @@ Always run **Check configuration** before **Restart**. If it complains, it names
 
 ## Make the dashboard yours
 
-The kit's dashboard is a file (`dashboards/home.yaml`), so it is rewritten each time you copy. Two ways to customise:
+DonkeyHome's dashboard is a file (`dashboards/home.yaml`), so it is rewritten each time you run DonkeyHome. Two ways to customise:
 
 - **Edit the file** in File editor. After saving, open the dashboard > three dots > **Refresh**. (Check configuration does not check dashboards: if a card is wrong it shows a red box.)
-- **Make your own dashboard in the screens:** **Settings > Dashboards > Add dashboard > Default dashboard**, then pencil icon to add cards by clicking. This one is never touched by the wizard.
+- **Make your own dashboard in the screens:** **Settings > Dashboards > Add dashboard > Default dashboard**, then pencil icon to add cards by clicking. This one is never touched by DonkeyHome.
 
 **Next:** [5. Looking after it](05-looking-after-it.md)

@@ -1,5 +1,6 @@
-# The Our Home dashboard. Room cards need the areas to exist with exactly these names:
-# Living Room, Kitchen, Bedroom, Bathroom (Settings > Areas, labels and zones).
+# Made by DonkeyHome.
+# The Our Home dashboard. Room cards need these areas (Settings > Areas, labels and zones):
+# Living Room, Kitchen, Bedroom, Bathroom
 
 title: "Our Home"
 views:

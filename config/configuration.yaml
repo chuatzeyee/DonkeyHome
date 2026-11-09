@@ -1,9 +1,13 @@
-# Home Assistant configuration made by the DonkeyHome wizard for Our Home.
+# Made by DonkeyHome. Home Assistant configuration for Our Home.
 # Most of the logic lives in packages/ (one file per subject). This file just switches things on.
 # After you edit any YAML file: Settings > Tools > YAML > Check configuration, then Restart.
 
 # The standard Home Assistant features (history, logbook, phone app, sun, zones, backups and more).
 default_config:
+
+# Themes from the themes folder (Home Assistant's own default).
+frontend:
+  themes: !include_dir_merge_named themes
 
 homeassistant:
   # Every .yaml file in packages/ is loaded automatically.

@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """DonkeyHome: Home Assistant starter wizard.
 
-Asks a few plain questions about your home and writes a ready-to-copy Home Assistant
-configuration folder (config/). Only uses Python's standard library.
+Turns a few answers about your home into a ready Home Assistant configuration.
+The DonkeyHome app (server.py) uses it behind its point-and-click screens; you can also run it
+yourself in a terminal (advanced, see docs/advanced-command-line.md). Standard library only.
 
-  python3 wizard/wizard.py                               ask the questions, write config/
-  python3 wizard/wizard.py --answers my-answers.json     no questions, use a saved answers file
-  python3 wizard/wizard.py --out somewhere/else          write the files somewhere else
+  python3 donkeyhome/app/wizard.py                            ask the questions, write config/
+  python3 donkeyhome/app/wizard.py --answers my-answers.json  no questions, use a saved answers file
+  python3 donkeyhome/app/wizard.py --out somewhere/else       write the files somewhere else
 
 Your answers are saved to my-answers.json so you can run the wizard again later and only
 change what you need.
@@ -16,19 +17,22 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import shutil
 import sys
 from pathlib import Path
 
 if sys.version_info < (3, 10):
     sys.exit("Python 3.10 or newer is needed. Get it from https://www.python.org/downloads/")
 
-ROOT = Path(__file__).resolve().parent.parent
+# When run from a download: donkeyhome/app/wizard.py -> the repository folder. (Not used inside the app.)
+ROOT = Path(__file__).resolve().parent.parent.parent
 DEFAULT_OUT = ROOT / "config"
 DEFAULT_ANSWERS = ROOT / "my-answers.json"
 
 NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 '&-]{0,39}$")
 NOTIFY_RE = re.compile(r"^[a-z0-9_]+$")
+MARKER = "# Made by DonkeyHome."
+UI_FILES = ("automations.yaml", "scripts.yaml", "scenes.yaml")  # created if missing, never overwritten
+OPTIONAL_FILES = ("packages/maintenance.yaml",)  # removed again when switched off (only if DonkeyHome made it)
 
 # Yes/no questions: key, question, default.
 CHOICES = [
@@ -86,6 +90,11 @@ def validate(raw: dict) -> dict:
     arrival = check_name(raw.get("arrival_room") or rooms[0], "Arrival room")
     if arrival not in rooms:
         raise AnswerError(f"The arrival room '{arrival}' is not one of your rooms: {', '.join(rooms)}.")
+    area_ids = {}
+    for room, area_id in (raw.get("area_ids") or {}).items():
+        if not NOTIFY_RE.match(str(area_id)):
+            raise AnswerError(f"The room id '{area_id}' is not valid.")
+        area_ids[check_name(room, "Room")] = str(area_id)
     try:
         delay = int(raw.get("leave_delay_minutes", 10))
     except (TypeError, ValueError):
@@ -99,6 +108,7 @@ def validate(raw: dict) -> dict:
         "arrival_room": arrival,
         "notify": [check_notify(n) for n in raw.get("notify", [])],
         "leave_delay_minutes": delay,
+        "area_ids": {room: area_ids.get(room, slug(room)) for room in rooms},
     }
     for key, _, default in CHOICES:
         clean[key] = bool(raw.get(key, default))
@@ -136,7 +146,7 @@ def ask_until_valid(prev: dict) -> dict:
         default_room = prev["arrival_room"] if prev["arrival_room"] in rooms else rooms[0]
         raw["arrival_room"] = ask("Which room should light up when you come home after dark?", default_room)
         print("\nPhone notifications: leave this empty for now if the Home Assistant app is not on your phones yet.")
-        print("docs/02-setting-up.md, step 7, shows how to find these names.")
+        print("docs/advanced-command-line.md shows how to find these names.")
         raw["notify"] = ask_list("Phone notify names", prev["notify"])
         raw["leave_delay_minutes"] = ask("How many minutes after the last person leaves should the house switch off?",
                                          str(prev["leave_delay_minutes"]))
@@ -176,13 +186,21 @@ def script(key: str, alias: str, icon: str, description: str, steps: list[str]) 
             "    mode: restart\n    sequence:\n" + "\n".join(steps))
 
 
+def area_of(a: dict, room: str) -> str:
+    return a.get("area_ids", {}).get(room) or slug(room)
+
+
 def configuration_yaml(a: dict) -> str:
-    return f"""# Home Assistant configuration made by the DonkeyHome wizard for {a['home_name']}.
+    return f"""{MARKER} Home Assistant configuration for {a['home_name']}.
 # Most of the logic lives in packages/ (one file per subject). This file just switches things on.
 # After you edit any YAML file: Settings > Tools > YAML > Check configuration, then Restart.
 
 # The standard Home Assistant features (history, logbook, phone app, sun, zones, backups and more).
 default_config:
+
+# Themes from the themes folder (Home Assistant's own default).
+frontend:
+  themes: !include_dir_merge_named themes
 
 homeassistant:
   # Every .yaml file in packages/ is loaded automatically.
@@ -208,7 +226,8 @@ def house_yaml(a: dict) -> str:
     sends = "\n".join(
         f"      - action: notify.{n}\n        data:\n          title: {q(a['home_name'])}\n"
         "          message: \"{{ message }}\"\n        continue_on_error: true" for n in a["notify"])
-    return f"""# House mode, the automatic leave/arrive switch and the "notify everyone" helper.
+    return f"""{MARKER}
+# House mode, the automatic leave/arrive switch and the "notify everyone" helper.
 
 input_select:
   house_mode:
@@ -221,7 +240,7 @@ input_select:
 
 input_boolean:
   auto_presence:
-    # Off until your phones are set up (docs/02-setting-up.md, step 8).
+    # Off until everyone's phone shows them at home (Settings > People). Then switch it on.
     name: Automatic leave and arrive
     icon: mdi:map-marker-radius
 
@@ -248,7 +267,7 @@ script:
 
 
 def routines_yaml(a: dict) -> str:
-    arrival = f"area_id: {slug(a['arrival_room'])}"
+    arrival = f"area_id: {area_of(a, a['arrival_room'])}"
     leave, night, off = [mode_step("Away")], [mode_step("Night")], []
     if a["lights_off_when_leaving"]:
         leave.append(step("Lights off", "light.turn_off"))
@@ -286,15 +305,16 @@ def routines_yaml(a: dict) -> str:
         script("routine_everything_off", "Everything Off", "mdi:power",
                "Lights, fans, aircon, TVs and speakers off. Nothing else changes.", off),
     ]
-    return ("# The one-tap routines. Each device step has continue_on_error, so one offline device never\n"
+    return (f"{MARKER}\n# The one-tap routines. Each device step has continue_on_error, so one offline device never\n"
             "# stops a routine. 'entity_id: all' means every device of that kind, so new devices are\n"
             "# included automatically. To change a routine, edit this file or run the wizard again.\n\n"
             "script:\n" + "\n\n".join(scripts) + "\n")
 
 
 def presence_yaml(a: dict) -> str:
-    return f"""# Runs Leaving Home when the last person leaves and I'm Home when the first person arrives.
-# Only works when the "Automatic leave and arrive" switch is on (docs/02-setting-up.md, step 8).
+    return f"""{MARKER}
+# Runs Leaving Home when the last person leaves and I'm Home when the first person arrives.
+# Only works when the "Automatic leave and arrive" switch on the dashboard is on.
 # zone.home counts how many people are at home.
 
 automation:
@@ -342,7 +362,8 @@ BATTERY_TEMPLATE = (
 
 
 def maintenance_yaml(a: dict) -> str:
-    return f"""# Weekly check-up: Sunday 10:00, lists every battery under 20 %.
+    return f"""{MARKER}
+# Weekly check-up: Sunday 10:00, lists every battery under 20 %.
 
 automation:
   - id: weekly_battery_check
@@ -371,9 +392,10 @@ def dashboard_yaml(a: dict) -> str:
         "            tap_action:\n              action: toggle"
         for key in ("routine_good_morning", "routine_leaving_home", "routine_arriving_home",
                     "routine_good_night", "routine_everything_off"))
-    rooms = "\n".join(f"          - type: area\n            area: {slug(r)}" for r in a["rooms"])
-    return f"""# The {a['home_name']} dashboard. Room cards need the areas to exist with exactly these names:
-# {', '.join(a['rooms'])} (Settings > Areas, labels and zones).
+    rooms = "\n".join(f"          - type: area\n            area: {area_of(a, r)}" for r in a["rooms"])
+    return f"""{MARKER}
+# The {a['home_name']} dashboard. Room cards need these areas (Settings > Areas, labels and zones):
+# {', '.join(a['rooms'])}
 
 title: {q(a['home_name'])}
 views:
@@ -421,13 +443,25 @@ def build(a: dict) -> dict[str, str]:
     return files
 
 
-def write(files: dict[str, str], out: Path) -> None:
-    if out.exists():
-        shutil.rmtree(out)  # ponytail: the folder is fully generated; keep your own edits in a copy
-    for rel, text in files.items():
+def plan(files: dict[str, str], out: Path) -> tuple[dict[str, str], list[str]]:
+    """What write() would do: (files to write, files to delete). Never touches your own files:
+    automations/scripts/scenes are only created when missing, and only DonkeyHome's files are deleted."""
+    to_write = {rel: text for rel, text in files.items() if rel not in UI_FILES or not (out / rel).exists()}
+    to_delete = [rel for rel in OPTIONAL_FILES if rel not in files and (out / rel).exists()
+                 and (out / rel).read_text(encoding="utf-8").startswith(MARKER)]
+    return to_write, to_delete
+
+
+def write(files: dict[str, str], out: Path) -> tuple[list[str], list[str]]:
+    """Write the files into out (a config folder). Returns (written, deleted) relative paths."""
+    to_write, to_delete = plan(files, out)
+    for rel, text in to_write.items():
         path = out / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
+    for rel in to_delete:
+        (out / rel).unlink()
+    return list(to_write), to_delete
 
 
 # ---------------------------------------------------------------- main
@@ -435,7 +469,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Make a starter Home Assistant configuration for your home.")
     ap.add_argument("--answers", type=Path, help="use this answers file instead of asking")
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT, help="where to write the config folder")
-    ap.add_argument("--yes", action="store_true", help="overwrite the output folder without asking")
+    ap.add_argument("--yes", action="store_true", help="write without asking")
     args = ap.parse_args(argv)
 
     try:
@@ -449,7 +483,7 @@ def main(argv: list[str] | None = None) -> int:
             DEFAULT_ANSWERS.write_text(json.dumps(answers, indent=2) + "\n", encoding="utf-8")
             print(f"\nAnswers saved to {DEFAULT_ANSWERS.name}.")
         if args.out.exists() and not args.yes and not args.answers:
-            if not ask_yes(f"Replace everything in {args.out}?", True):
+            if not ask_yes(f"Update the DonkeyHome files in {args.out}?", True):
                 print("Nothing changed.")
                 return 1
     except (AnswerError, json.JSONDecodeError, OSError) as err:
@@ -464,7 +498,7 @@ def main(argv: list[str] | None = None) -> int:
     print("Next: create these areas in Home Assistant (Settings > Areas, labels and zones):")
     for room in answers["rooms"]:
         print(f"  - {room}")
-    print("Then copy the folder in: docs/02-setting-up.md, step 4.")
+    print("Then copy the folder's contents into Home Assistant: docs/advanced-command-line.md.")
     return 0
 
 

@@ -26,7 +26,7 @@ It runs **in your home**, not in someone's cloud, so most things keep working wh
 | **Automation** | "When this happens, do that." Runs by itself. |
 | **Script / routine** | A list of steps you start with one tap, like **Good Night**. |
 | **Dashboard** | A screen of buttons and cards. |
-| **YAML** | The plain-text format the configuration files are written in. The wizard writes it for you. |
+| **YAML** | The plain-text format the configuration files are written in. DonkeyHome writes it for you. |
 
 ---
 
@@ -99,7 +99,7 @@ This erases everything on the mini PC (including Windows). Copy off anything you
 
 ## Step 4: Give it a fixed address
 
-So your phone and the wizard always find it, ask your router to keep Home Assistant on the same IP address.
+So your phones always find it, ask your router to keep Home Assistant on the same IP address.
 
 1. Open your router's app or web page and find the device list.
 2. Find **homeassistant** and choose **Reserve IP**, **Address reservation** or **Static DHCP** (the name depends on the router).
@@ -142,4 +142,4 @@ Do this now, before anything else. A backup lets you undo almost any mistake.
 | Raspberry Pi keeps restarting | Use the official power supply. Weak power supplies cause most Pi problems. |
 | Forgot the password | Owner accounts can be reset from the box's console: plug in a screen and keyboard and type `auth reset --username YOURNAME --password NEWPASSWORD`. |
 
-**Next:** [2. Setting up: run the wizard and copy your configuration](02-setting-up.md)
+**Next:** [2. Setting up: install DonkeyHome and answer six questions](02-setting-up.md)

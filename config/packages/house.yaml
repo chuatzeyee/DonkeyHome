@@ -1,3 +1,4 @@
+# Made by DonkeyHome.
 # House mode, the automatic leave/arrive switch and the "notify everyone" helper.
 
 input_select:
@@ -11,7 +12,7 @@ input_select:
 
 input_boolean:
   auto_presence:
-    # Off until your phones are set up (docs/02-setting-up.md, step 8).
+    # Off until everyone's phone shows them at home (Settings > People). Then switch it on.
     name: Automatic leave and arrive
     icon: mdi:map-marker-radius
 

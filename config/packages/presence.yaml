@@ -1,5 +1,6 @@
+# Made by DonkeyHome.
 # Runs Leaving Home when the last person leaves and I'm Home when the first person arrives.
-# Only works when the "Automatic leave and arrive" switch is on (docs/02-setting-up.md, step 8).
+# Only works when the "Automatic leave and arrive" switch on the dashboard is on.
 # zone.home counts how many people are at home.
 
 automation:
